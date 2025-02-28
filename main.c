@@ -38,8 +38,13 @@ static int checkselect(int *array, size_t length, size_t k, size_t value)
 static inline double selectCPUTime(int *array, size_t length, size_t k)
 {
     clock_t start = clock();
-    select(array, length, k, compareInt, swapInt);
-    return ((double)(clock() - start)) / CLOCKS_PER_SEC;
+    size_t q = select(array, length, k, compareInt, swapInt);
+    double time = ((double)(clock() - start)) / CLOCKS_PER_SEC;
+
+    if(!checkselect(array, length, k, q))
+        exit(-1);
+
+    return time;
 }
 
 int main(int argc, char **argv)
@@ -84,25 +89,29 @@ int main(int argc, char **argv)
     array = fillIncreasingArray(NULL, n);
     resetNbSwaps();
     resetNbComparisons();
-    printf("increasing    %f\t  (%zu,%zu)\n", selectCPUTime(array, n, k),
+    double temp = selectCPUTime(array, n, k);
+    printf("increasing    %f\t  (%zu,%zu)\n", temp,
            getNbSwaps(), getNbComparisons());
 
     fillDecreasingArray(array, n);
     resetNbSwaps();
     resetNbComparisons();
+    temp = selectCPUTime(array, n, k);
     printf("decreasing    %f\t  (%zu,%zu)\n", selectCPUTime(array, n, k),
            getNbSwaps(), getNbComparisons());
 
     fillRandomArray(array, n);
     resetNbSwaps();
     resetNbComparisons();
-    printf("random        %f\t  (%zu,%zu)\n", selectCPUTime(array, n, k),
+    temp = selectCPUTime(array, n, k);
+    printf("random        %f\t  (%zu,%zu)\n", temp,
            getNbSwaps(), getNbComparisons());
 
     fillConstantArray(array, n);
     resetNbSwaps();
     resetNbComparisons();
-    printf("constant      %f\t  (%zu,%zu)\n", selectCPUTime(array, n, k),
+    temp = selectCPUTime(array, n, k);
+    printf("constant      %f\t  (%zu,%zu)\n", temp,
            getNbSwaps(), getNbComparisons());
 
     free(array);
