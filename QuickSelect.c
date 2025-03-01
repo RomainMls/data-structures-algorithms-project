@@ -12,6 +12,7 @@ static size_t partition(void *array, size_t p, size_t r,
                  int (*compare)(const void *, size_t i, size_t j),
                  void (*swap)(void *array, size_t i, size_t j))
 {
+    swap(array, p + (r - p)/2, r);
     size_t i = p, j = p;
     int comp;
 
