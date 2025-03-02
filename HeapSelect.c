@@ -40,16 +40,14 @@ size_t select(void *array, size_t length, size_t k,
     size_t heap_size = length;
     build_min_heap(array, heap_size, length, compare, swap);
 
-    size_t counter = 0;
     for(int i = length - 1; i > 0; i--){
+        if(k == length - heap_size)
+            return 0;
+
         swap(array, i, 0);
         heap_size -= 1;
         min_heapify(array, 0, heap_size, compare, swap);
-
-        counter++;
-        if(k == counter - 1)
-            return length - 1 - k;
     }
 
-    return length - 1 - k;
+    return 0;
 }
