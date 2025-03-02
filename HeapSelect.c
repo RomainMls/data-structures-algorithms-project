@@ -5,6 +5,7 @@
 
  #include <stddef.h>
  #include "Select.h"
+ #include <stdio.h>
 
 static void min_heapify(void *array, size_t i, size_t heap_size, int (*compare)(const void *, size_t i, size_t j), void (*swap)(void *array, size_t i, size_t j)){
     size_t l = 2 * i + 1;
@@ -49,7 +50,6 @@ size_t select(void *array, size_t length, size_t k,
         if(k == counter - 1)
             return length - 1 - k;
     }
-    
-    printf("Element not found in the array\n");
-    return 0;
+
+    return length - 1 - k;
 }
