@@ -1,2 +1,6 @@
 .vscode
 *.o
+quickselect
+heapselect
+selectionselect
+frselect
