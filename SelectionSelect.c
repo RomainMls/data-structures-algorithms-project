@@ -23,6 +23,6 @@ size_t select(void *array, size_t length, size_t k,
         if(i == k)
             return k;
     }
-    printf("Min not found in the array\n");
+    printf("Element not found in the array\n");
     return 0;
 }
