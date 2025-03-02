@@ -25,8 +25,7 @@ static void min_heapify(void *array, size_t i, size_t heap_size, int (*compare)(
     }
 }
 
-static void build_min_heap(void *array, size_t heap_size, size_t length, int (*compare)(const void *, size_t i, size_t j), void (*swap)(void *array, size_t i, size_t j)){
-    heap_size = length;
+static void build_min_heap(void *array, size_t length, int (*compare)(const void *, size_t i, size_t j), void (*swap)(void *array, size_t i, size_t j)){
     for(int i = length / 2 - 1; i >= 0; i--){
         min_heapify(array, i, length, compare, swap);
     }
@@ -38,7 +37,7 @@ size_t select(void *array, size_t length, size_t k,
 {
 
     size_t heap_size = length;
-    build_min_heap(array, heap_size, length, compare, swap);
+    build_min_heap(array, length, compare, swap);
 
     for(int i = length - 1; i > 0; i--){
         if(k == length - heap_size)
