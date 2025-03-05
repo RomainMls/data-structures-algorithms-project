@@ -29,7 +29,7 @@ static void build_min_heap(void *array, size_t length, int (*compare)(const void
     for(int i = length / 2 - 1; i >= 0; i--){
         min_heapify(array, i, length, compare, swap);
     }
-}   
+}
 
 size_t select(void *array, size_t length, size_t k,
               int (*compare)(const void *, size_t i, size_t j),

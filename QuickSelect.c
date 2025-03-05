@@ -9,8 +9,8 @@
  #include <stdio.h>
 
 static size_t partition(void *array, size_t p, size_t r,
-                 int (*compare)(const void *, size_t i, size_t j),
-                 void (*swap)(void *array, size_t i, size_t j))
+                        int (*compare)(const void *, size_t i, size_t j),
+                        void (*swap)(void *array, size_t i, size_t j))
 {
     swap(array, p + (r - p)/2, r);
     size_t i = p, j = p;
@@ -28,8 +28,8 @@ static size_t partition(void *array, size_t p, size_t r,
 }
 
 static size_t select_r(void *array, size_t p, size_t r, size_t k,
-    int (*compare)(const void *, size_t i, size_t j),
-    void (*swap)(void *array, size_t i, size_t j))
+                       int (*compare)(const void *, size_t i, size_t j),
+                       void (*swap)(void *array, size_t i, size_t j))
 {
     if(p > r){
         printf("ERROR select_r(): given sub array bounds unvalid\n");
