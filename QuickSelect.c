@@ -31,17 +31,18 @@ static size_t partition(void *array, size_t p, size_t r,
 {
     size_t pivot = median(array, p, (p+r)/2, r, compare);
     swap(array, pivot, r);
+    pivot = r;
     size_t i = p, j = p;
 
-    while(j < r){
+    while(j < pivot){
 
-        if(compare(array, r, j) >= 0){
+        if(compare(array, pivot, j) >= 0){
             swap(array, i, j);
             i++;
         }
         j++;
     }
-    swap(array, i, r);
+    swap(array, i, pivot);
     return i;
 }
 

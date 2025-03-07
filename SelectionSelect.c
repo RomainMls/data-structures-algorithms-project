@@ -39,7 +39,7 @@ static inline size_t selectionSelectMax(
         max = i;
 
         for(size_t j = 0; j < i; j++)
-            if(compare(array, j, max) > 0)
+            if(compare(array, j, max) >= 0)
                 max = j;
 
         swap(array, i, max);
