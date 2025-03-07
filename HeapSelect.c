@@ -120,7 +120,7 @@ size_t select(void *array, size_t length, size_t k,
               void (*swap)(void *array, size_t i, size_t j))
 {
     if(k > length/2)
-        // heapselect using a max_heap will find the solution sooner
+        // heapselect using a max_heap will find the solution faster
         return heapselect_max(array, length, k, compare, swap);
 
     return heapselect_min(array, length, k, compare, swap);
