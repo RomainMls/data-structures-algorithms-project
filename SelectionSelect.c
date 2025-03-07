@@ -15,7 +15,7 @@ static inline size_t selection_select_min(
     size_t min;
     /*
      * INVARIANT:
-     * The array is sorted from 0 to i,
+     * The array is sorted from 0 to i - 1,
      * array[0] is the minimum of array.
      */
     for(size_t i = 0; i < length - 1; i++)
