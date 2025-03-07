@@ -11,12 +11,14 @@
 static size_t median(void *array, size_t a, size_t b, size_t c,
                      int (*compare)(const void *, size_t i, size_t j))
 {
-    if(compare(array, a, b)){
+    if(compare(array, a, b))
+    {
         if(compare(array, b, c))
             return b;
         else
             return c;
     }
+
     else
     {
         if(compare(array, a, c))
@@ -30,16 +32,26 @@ static size_t partition(void *array, size_t p, size_t r,
                         void (*swap)(void *array, size_t i, size_t j))
 {
     size_t pivot = median(array, p, (p+r)/2, r, compare);
+
     swap(array, pivot, r);
     pivot = r;
+
+    /*
+     * INVARIANT:
+     * i indicates the first element of the 'greater' category.
+     * j indicates the element we are analysing.
+     * j - 1 indicates the last element of the 'greater' category.
+     */
     size_t i = p, j = p;
-
-    while(j < pivot){
-
-        if(compare(array, pivot, j) >= 0){
+    while(j < pivot)
+    {
+        if(compare(array, pivot, j) >= 0)
+        {
+            // include element j in the 'less or equal' category
             swap(array, i, j);
             i++;
         }
+        // element j is already in the 'greater' category
         j++;
     }
     swap(array, i, pivot);
@@ -50,7 +62,8 @@ static size_t select_r(void *array, size_t p, size_t r, size_t k,
                        int (*compare)(const void *, size_t i, size_t j),
                        void (*swap)(void *array, size_t i, size_t j))
 {
-    if(p > r){
+    if(p > r)
+    {
         printf("ERROR select_r(): given sub array bounds unvalid\n");
         return -1;
     }

@@ -7,42 +7,57 @@
  #include <stdio.h>
  #include "Select.h"
 
-static inline size_t selectionSelectMin(
+static inline size_t selection_select_min(
     void *array, size_t length, size_t k,
     int (*compare)(const void *, size_t i, size_t j),
     void (*swap)(void *array, size_t i, size_t j)
 ){
     size_t min;
-
-    for(size_t i = 0; i < length - 1; i++){
+    /*
+     * INVARIANT:
+     * The array is sorted from 0 to i,
+     * array[0] is the minimum of array.
+     */
+    for(size_t i = 0; i < length - 1; i++)
+    {
+        // find the minimum of the nonsorted subarray
         min = i;
-
         for(size_t j = i + 1; j < length; j++)
             if(compare(array, j, min) < 0)
                 min = j;
 
+        // put the minimum on the sorted part of the array
         swap(array, i, min);
+
         if(i == k)
             return k;
     }
     return length - 1;
 }
 
-static inline size_t selectionSelectMax(
+static inline size_t selection_select_max(
     void *array, size_t length, size_t k,
     int (*compare)(const void *, size_t i, size_t j),
     void (*swap)(void *array, size_t i, size_t j)
 ){
     size_t max;
 
-    for(size_t i = length - 1; i > 0; i--){
+    /*
+     * INVARIANT:
+     * The array is sorted from i + 1 to length,
+     * array[length - 1] is the maximum of array.
+     */
+    for(size_t i = length - 1; i > 0; i--)
+    {
+        // find the maximum of the nonsorted subarray
         max = i;
-
         for(size_t j = 0; j < i; j++)
             if(compare(array, j, max) >= 0)
                 max = j;
 
+        // put the maximum on the sorted part of the array
         swap(array, i, max);
+
         if(i == k)
             return k;
     }
@@ -54,7 +69,7 @@ size_t select(void *array, size_t length, size_t k,
               void (*swap)(void *array, size_t i, size_t j))
 {
     if(k > length/2)
-        return selectionSelectMax(array, length, k, compare, swap);
+        return selection_select_max(array, length, k, compare, swap);
 
-    return selectionSelectMin(array, length, k, compare, swap);
+    return selection_select_min(array, length, k, compare, swap);
 }
