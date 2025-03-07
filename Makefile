@@ -12,7 +12,7 @@ ALL = selectionselect heapselect quickselect frselect
 # Executables
 all: $(ALL)
 
-selectionselect: main.o IntArray.o SelectionSelect.o 
+selectionselect: main.o IntArray.o SelectionSelect.o
 heapselect: main.o IntArray.o HeapSelect.o
 quickselect: main.o IntArray.o QuickSelect.o
 frselect: main.o IntArray.o FRSelect.o

@@ -8,11 +8,29 @@
  #include "IntArray.h"
  #include <stdio.h>
 
+static size_t median(void *array, size_t a, size_t b, size_t c,
+                     int (*compare)(const void *, size_t i, size_t j))
+{
+    if(compare(array, a, b)){
+        if(compare(array, b, c))
+            return b;
+        else
+            return c;
+    }
+    else
+    {
+        if(compare(array, a, c))
+            return a;
+        else
+            return c;
+    }
+}
 static size_t partition(void *array, size_t p, size_t r,
                         int (*compare)(const void *, size_t i, size_t j),
                         void (*swap)(void *array, size_t i, size_t j))
 {
-    swap(array, p + (r - p)/2, r);
+    size_t pivot = median(array, p, (p+r)/2, r, compare);
+    swap(array, pivot, r);
     size_t i = p, j = p;
 
     while(j < r){
@@ -33,7 +51,7 @@ static size_t select_r(void *array, size_t p, size_t r, size_t k,
 {
     if(p > r){
         printf("ERROR select_r(): given sub array bounds unvalid\n");
-        return 0;
+        return -1;
     }
 
     if(p == r && p == k)
