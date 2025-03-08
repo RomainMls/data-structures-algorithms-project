@@ -39,6 +39,7 @@ static size_t median(void *array, size_t a, size_t b, size_t c,
     }
 }
 
+// partitions the array into two gategories: 'less or equal' and 'greater'
 static size_t partition(void *array, size_t p, size_t r,
                         int (*compare)(const void *, size_t i, size_t j),
                         void (*swap)(void *array, size_t i, size_t j))
@@ -76,6 +77,61 @@ static size_t partition(void *array, size_t p, size_t r,
     return i;
 }
 
+// partitions the array into three categories: 'less', 'equal' and 'greater'
+static size_t partition3(void *array, size_t p, size_t r,
+                        int (*compare)(const void *, size_t i, size_t j),
+                        void (*swap)(void *array, size_t i, size_t j))
+{
+    size_t pivot = median(array, p, (p+r)/2, r, compare);
+
+    if(pivot != r)
+        swap(array, pivot, r);
+
+    pivot = r;
+
+    /*
+     * INVARIANT:
+     * i indicates the first element of the 'greater' category.
+     * j indicates the element we are analysing.
+     * k indicates the first element of the 'equal' category.
+     * j - 1 indicates the last element of the 'greater' category.
+     */
+    size_t i = p, j = p, k = p;
+    while(j < pivot)
+    {
+        if(compare(array, j, pivot) < 0)
+        {
+            if(i != j)
+                swap(array, i, j);
+
+            if(k != i)
+                swap(array, k, i);
+
+            k++;
+            i++;
+            j++;
+        }
+        else
+        {
+            if(compare(array, j, pivot) == 0)
+            {
+                if(i != j)
+                    swap(array, i, j);
+
+                i++;
+                j++;
+            }
+
+            // j is greater than pivot
+            j++;
+        }
+    }
+    if(i != pivot)
+        swap(array, i, pivot);
+
+    return i;
+}
+
 static size_t select_r(void *array, size_t p, size_t r, size_t k,
                        int (*compare)(const void *, size_t i, size_t j),
                        void (*swap)(void *array, size_t i, size_t j))
@@ -89,7 +145,7 @@ static size_t select_r(void *array, size_t p, size_t r, size_t k,
     if(p == r && p == k)
         return p;
 
-    size_t q = partition(array, p, r, compare, swap);
+    size_t q = partition3(array, p, r, compare, swap);
 
     if(q == k)
         return q;
