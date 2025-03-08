@@ -11,22 +11,34 @@
 static size_t median(void *array, size_t a, size_t b, size_t c,
                      int (*compare)(const void *, size_t i, size_t j))
 {
-    if(compare(array, a, b))
+    if(compare(array, a, b) > 0)
     {
-        if(compare(array, b, c))
-            return b;
-        else
-            return c;
-    }
+        if(compare(array, c, a) > 0)
+            return a;
 
+        else
+        {
+            if(compare(array, b, c) > 0)
+                return b;
+
+            return c;
+        }
+    }
     else
     {
-        if(compare(array, a, c))
+        if(compare(array, a, c) > 0)
             return a;
+
         else
+        {
+            if(compare(array, b, c) < 0)
+                return b;
+
             return c;
+        }
     }
 }
+
 static size_t partition(void *array, size_t p, size_t r,
                         int (*compare)(const void *, size_t i, size_t j),
                         void (*swap)(void *array, size_t i, size_t j))
