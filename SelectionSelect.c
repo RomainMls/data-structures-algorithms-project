@@ -24,12 +24,13 @@ static inline size_t selection_select_min(
         // find the minimum of the nonsorted subarray
         min = i;
         for(size_t j = i + 1; j < length; j++)
+            // keep the most left minimum for swapping in order to preserve stability
             if(compare(array, j, min) < 0)
                 min = j;
 
         // put the minimum on the sorted part of the array
         if(i != min)
-            swap(array, i, min);
+            swap(array, i, min);    // stabiliy is preserved since i is the most left minimum
 
         if(i == k)
             return k;
@@ -56,11 +57,12 @@ static inline size_t selection_select_max(
         max = 0;
         for(size_t j = 1; j <= i; j++)
             if(compare(array, j, max) >= 0)
+                // keep the most right maximum for swapping in order to preserve stability
                 max = j;
 
         // put the maximum on the sorted part of the array
         if(i != max)
-            swap(array, i, max);
+            swap(array, i, max);    // stability is preserved since i is the most right maximum
 
         if(i == k)
             return k;
