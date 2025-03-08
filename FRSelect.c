@@ -6,6 +6,8 @@
  #include <stddef.h>
  #include "Select.h"
  #include <math.h>
+ #include <stdlib.h>
+ #include <stdio.h>
 
 static double sign(double x){
     if(x >= 0)
@@ -29,49 +31,83 @@ static size_t min(size_t a, size_t b){
 }
 
 static size_t select_r(void *array, size_t left, size_t right, size_t k,
-                       int (*compare)(const void *, size_t i, size_t j),
-                       void (*swap)(void *array, size_t i, size_t j))
+                      int (*compare)(const void *, size_t i, size_t j),
+                      void (*swap)(void *array, size_t i, size_t j))
 {
-    while(right > left){
-        if(right - left > 600){
+    while (left < right) {
+        // Use recursion for large arrays for better performance
+        if (right - left > 600) {
             size_t n = right - left + 1;
             size_t i = k - left + 1;
             double z = log(n);
-            double s = 0.5 * exp(2 * z/3);
-            double sd = 0.5 * sqrt(z * s * (n-s)/n) * sign(i - n/2);
-            size_t newLeft = max(left, k - i * (s/n) + sd);
-            size_t newRight = min(right, k + (n - i) * (s/n) + sd);
+            double s = 0.5 * exp(2 * z / 3);
+
+            // Standard deviation calculation
+            double sd;
+            if (i > n/2) {
+                sd = 0.5 * sqrt(z * s * (n - s) / n);
+            } else {
+                sd = -0.5 * sqrt(z * s * (n - s) / n);
+            }
+
+            // Recursively sample a smaller interval
+            size_t newLeft = (k - i * s / n + sd > left) ?
+                             (size_t)(k - i * s / n + sd) : left;
+            size_t newRight = (k + (n - i) * s / n + sd < right) ?
+                              (size_t)(k + (n - i) * s / n + sd) : right;
+
             select_r(array, newLeft, newRight, k, compare, swap);
         }
-        size_t i = left;
-        size_t j = right;
-        swap(array, left, k);
-        if(compare(array, right, k) < 0)
-            swap(array, right, left);
 
-        while(i < j){
+        // Base case - perform partition
+        // Move pivot to the left position
+        swap(array, left, k);
+
+        // Initial index for partitioning
+        size_t i = left + 1;
+        size_t j = right;
+
+        // Ensure pivot >= rightmost element
+        if (compare(array, right, left) < 0) {
+            swap(array, left, right);
+        }
+
+        // Main partitioning loop
+        while (i < j) {
+            // Swap elements in wrong positions
             swap(array, i, j);
             i++;
             j--;
-            while(compare(array, i, k) < 0)
-                i++;
-            while(compare(array, j, k) > 0)
-                j++;
-        }
-        if(compare(array, left, k) == 0)
-            swap(array, left, j);
 
-        else{
+            // Find element >= pivot from left
+            while (compare(array, i, left) < 0) {
+                i++;
+            }
+
+            // Find element <= pivot from right
+            while (compare(array, left, j) < 0) {
+                j--;
+            }
+        }
+
+        // Handle final pivot placement
+        if (compare(array, left, j) == 0) {
+            swap(array, left, j);
+        } else {
             j++;
             swap(array, j, right);
         }
-        if(j <= k)
-            left = j + 1;
 
-        if(k <= j)
+        // Adjust search boundaries based on pivot position
+        if (j <= k) {
+            left = j + 1;
+        }
+        if (k <= j) {
             right = j - 1;
+        }
     }
-    return 0;
+
+    return k;
 }
 
 size_t select(void *array, size_t length, size_t k,
