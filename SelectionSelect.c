@@ -30,7 +30,7 @@ static inline size_t selection_select_min(
 
         // put the minimum on the sorted part of the array
         if(i != min)
-            swap(array, i, min);    // stabiliy is preserved since i is the most left minimum
+            swap(array, min, i);    // stabiliy is preserved since min is the most left minimum
 
         if(i == k)
             return k;
@@ -62,7 +62,7 @@ static inline size_t selection_select_max(
 
         // put the maximum on the sorted part of the array
         if(i != max)
-            swap(array, i, max);    // stability is preserved since i is the most right maximum
+            swap(array, max, i);    // stability is preserved since max is the most right maximum
 
         if(i == k)
             return k;
