@@ -33,7 +33,9 @@ static size_t partition(void *array, size_t p, size_t r,
 {
     size_t pivot = median(array, p, (p+r)/2, r, compare);
 
-    swap(array, pivot, r);
+    if(pivot != r)
+        swap(array, pivot, r);
+
     pivot = r;
 
     /*
@@ -48,13 +50,17 @@ static size_t partition(void *array, size_t p, size_t r,
         if(compare(array, pivot, j) >= 0)
         {
             // include element j in the 'less or equal' category
-            swap(array, i, j);
+            if(i != j)
+                swap(array, i, j);
+
             i++;
         }
         // element j is already in the 'greater' category
         j++;
     }
-    swap(array, i, pivot);
+    if(i != pivot)
+        swap(array, i, pivot);
+
     return i;
 }
 

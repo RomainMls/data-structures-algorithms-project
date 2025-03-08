@@ -16,6 +16,7 @@ static inline size_t selection_select_min(
     /*
      * INVARIANT:
      * The array is sorted from 0 to i - 1,
+     * the array is unsorted from i to length -1.
      * array[0] is the minimum of array.
      */
     for(size_t i = 0; i < length - 1; i++)
@@ -27,7 +28,8 @@ static inline size_t selection_select_min(
                 min = j;
 
         // put the minimum on the sorted part of the array
-        swap(array, i, min);
+        if(i != min)
+            swap(array, i, min);
 
         if(i == k)
             return k;
@@ -45,18 +47,20 @@ static inline size_t selection_select_max(
     /*
      * INVARIANT:
      * The array is sorted from i + 1 to length,
+     * the array is unsorted from 0 to i.
      * array[length - 1] is the maximum of array.
      */
     for(size_t i = length - 1; i > 0; i--)
     {
         // find the maximum of the nonsorted subarray
-        max = i;
-        for(size_t j = 0; j < i; j++)
+        max = 0;
+        for(size_t j = 1; j <= i; j++)
             if(compare(array, j, max) >= 0)
                 max = j;
 
         // put the maximum on the sorted part of the array
-        swap(array, i, max);
+        if(i != max)
+            swap(array, i, max);
 
         if(i == k)
             return k;
