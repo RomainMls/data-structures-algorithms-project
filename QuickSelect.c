@@ -101,6 +101,7 @@ static size_t partition3(void *array, size_t p, size_t r,
     {
         if(compare(array, j, pivot) < 0)
         {
+            // put element in 'less' category
             if(i != j)
                 swap(array, i, j);
 
@@ -115,21 +116,34 @@ static size_t partition3(void *array, size_t p, size_t r,
         {
             if(compare(array, j, pivot) == 0)
             {
+                // put element in 'equl' category
                 if(i != j)
                     swap(array, i, j);
 
                 i++;
                 j++;
             }
-
-            // j is greater than pivot
-            j++;
+            else
+            {
+                // put element in 'greater' categoryy
+                j++;
+            }
         }
     }
-    if(i != pivot)
-        swap(array, i, pivot);
+    size_t middleEqualCategory = (i - 1 - k)/2 + k;
+    if (i > k)
+    {
+        swap(array, pivot, middleEqualCategory);
+        swap(array, i, r);
+        return middleEqualCategory;
+    }
+    else
+    {
+        if(i != pivot)
+            swap(array, i, pivot);
 
-    return i;
+        return i;
+    }
 }
 
 static size_t select_r(void *array, size_t p, size_t r, size_t k,
