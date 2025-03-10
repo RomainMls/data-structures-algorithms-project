@@ -7,6 +7,8 @@
  #include <stdio.h>
  #include "Select.h"
 
+// sorts the array from left to right
+// until element number k is found
 static inline size_t selection_select_min(
     void *array, size_t length, size_t k,
     int (*compare)(const void *, size_t i, size_t j),
@@ -38,6 +40,8 @@ static inline size_t selection_select_min(
     return length - 1;
 }
 
+// sorts the array from right to left
+// until element number k is found
 static inline size_t selection_select_max(
     void *array, size_t length, size_t k,
     int (*compare)(const void *, size_t i, size_t j),
@@ -75,6 +79,7 @@ size_t select(void *array, size_t length, size_t k,
               void (*swap)(void *array, size_t i, size_t j))
 {
     if(k > length/2)
+        // selection_select_max will find the solution faster
         return selection_select_max(array, length, k, compare, swap);
 
     return selection_select_min(array, length, k, compare, swap);
