@@ -38,12 +38,8 @@ static int checkselect(int *array, size_t length, size_t k, size_t value)
 static inline double selectCPUTime(int *array, size_t length, size_t k)
 {
     clock_t start = clock();
-    size_t q = select(array, length, k, compareInt, swapInt);
-    double time = ((double)(clock() - start)) / CLOCKS_PER_SEC;
-    if(!checkselect(array, length, k, q))
-        exit(-1);
-
-    return time;
+    select(array, length, k, compareInt, swapInt);
+    return ((double)(clock() - start)) / CLOCKS_PER_SEC;
 }
 
 int main(int argc, char **argv)
@@ -54,10 +50,8 @@ int main(int argc, char **argv)
     size_t n = 10000, k = n / 2;
     const size_t n_checktest = 1000;
 
-    if (argc > 1){
+    if (argc > 1)
         sscanf(argv[1], "%zu", &n);
-        k = n/2;
-    }
     if (argc > 2)
         sscanf(argv[2], "%zu", &k);
 

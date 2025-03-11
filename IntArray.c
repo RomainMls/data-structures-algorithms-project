@@ -48,10 +48,8 @@ int *fillDecreasingArray(int *array, size_t length)
 
     const unsigned STEP = 1 + UPPER_BOUND / length;
     array[length - 1] = rand() % STEP;
-    for (size_t i = length - 2; i > 0; i--)
+    for (int i = length - 2; i >= 0; i--)
         array[i] = array[i + 1] + rand() % STEP;
-
-    array[0] = array[1] + rand() % STEP;
 
     return array;
 }
