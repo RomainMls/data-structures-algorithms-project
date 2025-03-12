@@ -53,3 +53,22 @@
   - Decreasing:   0.010145/4236542
   - Random:       0.013256/3123433
   - Constant:     0.007001/3999482
+
+# FRSelect
+
+- 10^4
+  - Increasing:   0.000053/29994
+  - Decreasing:   0.000034/15000
+  - Random:       0.000193/47639
+  - Constant:     0.000080/39958
+
+- 10^5
+  - Increasing:   0.000494/300001
+  - Decreasing:   0.001410/576959
+  - Random:       0.001327/309834
+  - Constant:     0.000724/399890
+- 10^6
+  - Increasing:   0.005098/2999622
+  - Decreasing:   0.011292/4460718
+  - Random:       0.007733/2339803
+  - Constant:     0.007101/3999482

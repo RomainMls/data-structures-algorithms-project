@@ -139,10 +139,13 @@ static size_t pivot_from_sample(void *array, size_t p, size_t r, size_t k,
 {
     size_t sampleSize = sqrt(r + 1 - p);
     size_t correspondingK = k * sampleSize / (r + 1 - p);
+    if(correspondingK >= sampleSize)
+        correspondingK = sampleSize - 1;
+
     size_t * sample = create_sample(p, r, sampleSize);
 
-    size_t pivotFromSample = sample_quickSelect(sample, 0, sampleSize - 1, correspondingK, array, compare);
-    size_t pivotIndex = sample[pivotFromSample];
+    size_t sample_pivot = sample_quickSelect(sample, 0, sampleSize - 1, correspondingK, array, compare);
+    size_t pivotIndex = sample[sample_pivot];
 
     free(sample);
 
@@ -156,7 +159,6 @@ static size_t partition3_with_sample_pivot(void *array, size_t p, size_t r, size
                                           void (*swap)(void *array, size_t i, size_t j))
 {
     size_t pivot = pivot_from_sample(array, p, r, k, compare);
-    fprintf(stderr, "parititon3_with_sample_pivot, p = %zu, r = %zu, pivot = %zu\n", p, r, pivot);
 
     if(pivot != r)
         swap(array, pivot, r);
