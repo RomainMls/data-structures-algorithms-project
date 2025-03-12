@@ -6,7 +6,6 @@
  #include <stddef.h>
  #include "Select.h"
  #include "IntArray.h"
- #include <stdio.h>
  #include <stdlib.h>
 
 static size_t median(void *array, size_t a, size_t b, size_t c,
@@ -67,8 +66,8 @@ static size_t partition(void *array, size_t p, size_t r,
 
 // partitions the array into three categories: 'less', 'equal' and 'greater'
 static size_t partition3(void *array, size_t p, size_t r,
-                        int (*compare)(const void *, size_t i, size_t j),
-                        void (*swap)(void *array, size_t i, size_t j))
+                         int (*compare)(const void *, size_t i, size_t j),
+                         void (*swap)(void *array, size_t i, size_t j))
 {
     size_t pivot = median(array, p, (p+r)/2, r, compare);
 
@@ -104,7 +103,7 @@ static size_t partition3(void *array, size_t p, size_t r,
         {
             if(compare(array, j, pivot) == 0)
             {
-                // put element in 'equl' category
+                // put element in 'equal' category
                 if(i != j)
                     swap(array, i, j);
 
@@ -141,10 +140,7 @@ static size_t select_r(void *array, size_t p, size_t r, size_t k,
                        void (*swap)(void *array, size_t i, size_t j))
 {
     if(p > r)
-    {
-        printf("ERROR select_r(): given sub array bounds unvalid\n");
-        return -1;
-    }
+        return 0;
 
     if(p == r && p == k)
         return p;
@@ -155,7 +151,7 @@ static size_t select_r(void *array, size_t p, size_t r, size_t k,
         return q;
 
     if(q > k)
-        return select_r(array, p, q - 1, k, compare, swap);
+        return select_r(array, p, q-1, k, compare, swap);
 
     else
         return select_r(array, q+1, r, k, compare, swap);
