@@ -5,7 +5,6 @@
 
  #include <stddef.h>
  #include "Select.h"
- #include <stdio.h>
 
 static void min_heapify(void *array, size_t i, size_t heapSize,
                         int (*compare)(const void *, size_t i, size_t j),

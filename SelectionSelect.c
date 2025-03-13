@@ -4,7 +4,6 @@
  * ========================================================================= */
 
  #include <stddef.h>
- #include <stdio.h>
  #include "Select.h"
 
 // sorts the array from left to right

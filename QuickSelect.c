@@ -6,7 +6,6 @@
  #include <stddef.h>
  #include "Select.h"
  #include "IntArray.h"
- #include <stdlib.h>
 
 static size_t median(void *array, size_t a, size_t b, size_t c,
                      int (*compare)(const void *, size_t i, size_t j))
@@ -24,44 +23,6 @@ static size_t median(void *array, size_t a, size_t b, size_t c,
         return b;
 
     return c;
-}
-
-// partitions the array into two gategories: 'less or equal' and 'greater'
-static size_t partition(void *array, size_t p, size_t r,
-                        int (*compare)(const void *, size_t i, size_t j),
-                        void (*swap)(void *array, size_t i, size_t j))
-{
-    size_t pivot = median(array, p, (p+r)/2, r, compare);
-
-    if(pivot != r)
-        swap(array, pivot, r);
-
-    pivot = r;
-
-    /*
-     * INVARIANT:
-     * i indicates the first element of the 'greater' category.
-     * j indicates the element we are analysing.
-     * j - 1 indicates the last element of the 'greater' category.
-     */
-    size_t i = p, j = p;
-    while(j < pivot)
-    {
-        if(compare(array, pivot, j) >= 0)
-        {
-            // include element j in the 'less or equal' category
-            if(i != j)
-                swap(array, i, j);
-
-            i++;
-        }
-        // element j is already in the 'greater' category
-        j++;
-    }
-    if(i != pivot)
-        swap(array, i, pivot);
-
-    return i;
 }
 
 // partitions the array into three categories: 'less', 'equal' and 'greater'

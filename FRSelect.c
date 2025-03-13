@@ -7,8 +7,6 @@
  #include "Select.h"
  #include <math.h>
  #include <stdlib.h>
- #include <string.h>
- #include <stdio.h>
 
 static void swapSample(size_t *sample, size_t i, size_t j)
 {
