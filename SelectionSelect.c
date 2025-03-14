@@ -13,7 +13,6 @@ static inline size_t selection_select_min(
     int (*compare)(const void *, size_t i, size_t j),
     void (*swap)(void *array, size_t i, size_t j)
 ){
-    size_t min;
     /*
      * INVARIANT:
      * The array is sorted from 0 to i - 1,
@@ -23,7 +22,7 @@ static inline size_t selection_select_min(
     for(size_t i = 0; i < length - 1; i++)
     {
         // find the minimum of the nonsorted subarray
-        min = i;
+        size_t min = i;
         for(size_t j = i + 1; j < length; j++)
             // keep the most left minimum for swapping in order to preserve stability
             if(compare(array, j, min) < 0)
@@ -46,8 +45,6 @@ static inline size_t selection_select_max(
     int (*compare)(const void *, size_t i, size_t j),
     void (*swap)(void *array, size_t i, size_t j)
 ){
-    size_t max;
-
     /*
      * INVARIANT:
      * The array is sorted from i + 1 to length,
@@ -57,7 +54,7 @@ static inline size_t selection_select_max(
     for(size_t i = length - 1; i > 0; i--)
     {
         // find the maximum of the nonsorted subarray
-        max = 0;
+        size_t max = 0;
         for(size_t j = 1; j <= i; j++)
             if(compare(array, j, max) >= 0)
                 // keep the most right maximum for swapping in order to preserve stability

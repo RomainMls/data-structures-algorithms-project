@@ -96,9 +96,9 @@ static size_t partition3(void *array, size_t p, size_t r,
     }
 }
 
-static size_t select_r(void *array, size_t p, size_t r, size_t k,
-                       int (*compare)(const void *, size_t i, size_t j),
-                       void (*swap)(void *array, size_t i, size_t j))
+static size_t quick_select(void *array, size_t p, size_t r, size_t k,
+                           int (*compare)(const void *, size_t i, size_t j),
+                           void (*swap)(void *array, size_t i, size_t j))
 {
     if(p > r)
         return 0;
@@ -112,15 +112,15 @@ static size_t select_r(void *array, size_t p, size_t r, size_t k,
         return q;
 
     if(q > k)
-        return select_r(array, p, q-1, k, compare, swap);
+        return quick_select(array, p, q-1, k, compare, swap);
 
     else
-        return select_r(array, q+1, r, k, compare, swap);
+        return quick_select(array, q+1, r, k, compare, swap);
 }
 
 size_t select(void *array, size_t length, size_t k,
               int (*compare)(const void *, size_t i, size_t j),
               void (*swap)(void *array, size_t i, size_t j))
 {
-    return select_r(array, 0, length - 1, k, compare, swap);
+    return quick_select(array, 0, length - 1, k, compare, swap);
 }
