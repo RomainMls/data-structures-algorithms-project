@@ -1,110 +1,127 @@
 /* ========================================================================= *
- * FRSelect
- * Implementation of the Floyd-Rivest algorithm
- * ========================================================================= */
+* FRSelect
+* Implementation of the Floyd-Rivest algorithm
+* ========================================================================= */
 
- #include <stddef.h>
- #include "Select.h"
- #include <math.h>
- #include <stdlib.h>
+#include <stddef.h>
+#include <math.h>
+#include <stdio.h>
+#include "Select.h"
 
-static int sign(double x)
-{
-	if (x < 0)
-		return -1;
-
-	if (x > 0)
-		return 1;
-
-	return 0;
+static int max(int x, int y){
+    if(x > y)
+        return x;
+    else
+        return y;
 }
 
-static size_t min(size_t a, size_t b)
-{
-    if(a > b)
-        return b;
-
-    return a;
+static int min(int x, int y){
+    if(x < y)
+        return x;
+    else
+        return y;
 }
 
-static size_t max(size_t a, size_t b)
-{
-    if(a > b)
-        return a;
-
-    return b;
+static int sign(int x){
+    if(x < 0)
+        return -1;
+    else
+        return 1;
 }
 
-static size_t FRSelect(void *array, size_t left, size_t right, size_t k,
-                       int (*compare)(const void *, size_t i, size_t j),
-                       void (*swap)(void *array, size_t i, size_t j))
-{
-	while (right > left) {
-		if (right - left > 600) {
-			// Choosing a small subarray
-			// S based on sampling.
-			// 600, 0.5 and 0.5
-			// are arbitrary constants
-			int n = right - left + 1;
-			int i = k - left + 1;
-			double z = log(n);
-			double s = 0.5 * exp(2 * z / 3);
-			double sd = 0.5 * sqrt(z * s
-								* (n - s) / n)
-						* sign(i - n / 2);
+static size_t fr_select(void *array, size_t left, size_t right, size_t k, int (*compare)(const void *, size_t i, size_t j), void (*swap)(void *array, size_t i, size_t j)){
+    fprintf(stderr, "1111111111\n");
+    while(right > left){
+        if(right - left > 600){
+            fprintf(stderr, "[INFO] left = %zu, right = %zu, k = %zu\n", left, right, k);
+        
+            size_t n = right - left + 1;
+            size_t i = k - left + 1;
+            double z = log(n);
+            double s = 0.5 * exp(2 * z / 3);
+            double sd = 0.5 * sqrt(z * s * (n - s) / n) * sign(i - n/2);
+        
+            // 🔥 Affichage des valeurs intermédiaires 🔥
+            fprintf(stderr, "[CALCUL] n = %zu, i = %zu, z = %f, s = %f, sd = %f\n", n, i, z, s, sd);
+        
+            size_t new_left = max(left, (size_t) (k - (i * s / n) + sd));
+            size_t new_right = min(right, (size_t) (k + ((n - i) * s / n) + sd));
+        
+            // 🔥 Vérification des nouvelles bornes 🔥
+            fprintf(stderr, "[NOUVELLES BORNES] new_left = %zu, new_right = %zu\n", new_left, new_right);
+        
+            // 📌 Détection d'erreur potentielle avant la récursion 📌
+            if (new_left >= new_right) 
+                fprintf(stderr, "⚠️ ERREUR FATALE: new_left (%zu) >= new_right (%zu) → STOP RECURSION\n", new_left, new_right);
+            
+        
+            fprintf(stderr, "✅ Appel récursif: left = %zu, right = %zu, k = %zu, new_left = %zu, new_right = %zu\n", 
+                left, right, k, new_left, new_right);
+            fr_select(array, new_left, new_right, k, compare, swap);
+        }
+        fprintf(stderr, "22222222222\n");
+        size_t t = k; //Save t position
+        size_t i = left;
+        size_t j = right;
 
-			int newLeft = max(left,
-							(size_t)(k - i * s / n + sd));
+        swap(array, left, k);
+        t = left; //t is now at left
 
-			int newRight = min(right,
-							(size_t)(k + (n - i) * s / n
-									+ sd));
-
-			FRSelect(array, newLeft, newRight, k, compare, swap);
-		}
-
-		long i = left;
-		long j = right;
-		swap(array, left, k);
-
-        if(compare(array, right, k) > 0)
-        {
+        if(compare(array, right, t) > 0){
             swap(array, left, right);
+            t = right; //t is now at right in this case
         }
 
-		while (i < j) {
-			swap(array, i, j);
-			i++;
-			j--;
-            while(compare(array, i, k) < 0)
+        while(i < j){
+            swap(array, i, j);
+
+            if(t == i)
+                t = j;
+            else if(t == j)
+                t = i;
+
+            i++;
+            j--;
+
+            while(i < right && compare(array, i, t) < 0)
                 i++;
+            while(j > left && compare(array, j, t) > 0)
+                j--;  
+        }
+        fprintf(stderr, "33333333333333\n");
 
-            while(compare(array, j, k) > 0)
-                j--;
-		}
-
-        if(compare(array, left, k) == 0)
+        if(compare(array, left, t) == 0){
             swap(array, left, j);
-
-        else
-        {
+            if(t == left)
+                t = j;
+            else if(t == j)
+                t = left;
+        }
+        else{
             j++;
-            swap(array, right, j);
+            if(j <= right){
+                swap(array, j, right);
+                if(t == j)
+                    t = right;
+                else if(t == right)
+                    t = j;
+            }
         }
 
-		// Adjust the left and right pointers
-		// to select the subarray having k
-		if (j <= k)
-			left = j + 1;
-		if (k <= j)
-			right = j - 1;
-	}
-	return k;
+        if(j <= k)
+            left = j + 1;
+        if(k <= j)
+            right = j - 1;
+    }
+
+    return k;
 }
 
 size_t select(void *array, size_t length, size_t k,
-              int (*compare)(const void *, size_t i, size_t j),
-              void (*swap)(void *array, size_t i, size_t j))
+    int (*compare)(const void *, size_t i, size_t j),
+    void (*swap)(void *array, size_t i, size_t j))
 {
-    return FRSelect(array, 0, length - 1, k, compare, swap);
+
+return fr_select(array, 0, length - 1, k, compare, swap);
 }
+
