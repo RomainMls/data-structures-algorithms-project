@@ -38,8 +38,8 @@ static void build_min_heap(void *array, size_t length,
 }
 
 static size_t heapselect_min(void *array, size_t length, size_t k,
-                      int (*compare)(const void *, size_t i, size_t j),
-                      void (*swap)(void *array, size_t i, size_t j))
+                             int (*compare)(const void *, size_t i, size_t j),
+                             void (*swap)(void *array, size_t i, size_t j))
 {
     size_t heapSize = length;
     build_min_heap(array, length, compare, swap);
@@ -91,8 +91,8 @@ static void build_max_heap(void *array, size_t length,
 }
 
 static size_t heapselect_max(void *array, size_t length, size_t k,
-                      int (*compare)(const void *, size_t i, size_t j),
-                      void (*swap)(void *array, size_t i, size_t j))
+                             int (*compare)(const void *, size_t i, size_t j),
+                             void (*swap)(void *array, size_t i, size_t j))
 {
     size_t heapSize = length;
     build_max_heap(array, length, compare, swap);

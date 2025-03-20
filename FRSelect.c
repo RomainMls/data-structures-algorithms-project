@@ -5,7 +5,6 @@
 
 #include <stddef.h>
 #include <math.h>
-#include <stdio.h>
 #include "Select.h"
 
 static int max(int x, int y){
@@ -32,18 +31,18 @@ static int sign(int x){
 static size_t fr_select(void *array, size_t left, size_t right, size_t k, int (*compare)(const void *, size_t i, size_t j), void (*swap)(void *array, size_t i, size_t j)){
     while(right > left){
         if(right - left > 600){
-        
+
             size_t n = right - left + 1;
             size_t i = k - left + 1;
             double z = log(n);
             double s = 0.5 * exp(2 * z / 3);
-            double sd = 0.5 * sqrt(z * s * (n - s) / n) * sign(i - n/2);        
+            double sd = 0.5 * sqrt(z * s * (n - s) / n) * sign(i - n/2);
             size_t new_left = max(left, (size_t) (k - (i * s / n) + sd));
             size_t new_right = min(right, (size_t) (k + ((n - i) * s / n) + sd));
-    
+
             fr_select(array, new_left, new_right, k, compare, swap);
         }
-        
+
         //Partition the elements between left and right around t
 
         // ! We must think to update the t var because normally we do t = array[k] but t is a void type.
@@ -75,7 +74,7 @@ static size_t fr_select(void *array, size_t left, size_t right, size_t k, int (*
             while(i < right && compare(array, i, t) < 0)
                 i++;
             while(j > left && compare(array, j, t) > 0)
-                j--;  
+                j--;
         }
 
         if(compare(array, left, t) == 0){
@@ -109,7 +108,6 @@ size_t select(void *array, size_t length, size_t k,
     int (*compare)(const void *, size_t i, size_t j),
     void (*swap)(void *array, size_t i, size_t j))
 {
-
-return fr_select(array, 0, length - 1, k, compare, swap);
+    return fr_select(array, 0, length - 1, k, compare, swap);
 }
 

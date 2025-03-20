@@ -32,7 +32,8 @@ typedef struct
 }
 Bounds;
 
-// partitions the array into three categories: 'less', 'equal' and 'greater'
+// partitions the array into three subarrays: 'less', 'equal' and 'greater'
+// returns the bounds of the 'equal' subarray
 static Bounds partition3(void *array, size_t p, size_t r,
                          int (*compare)(const void *, size_t i, size_t j),
                          void (*swap)(void *array, size_t i, size_t j))
@@ -46,17 +47,17 @@ static Bounds partition3(void *array, size_t p, size_t r,
 
     /*
      * INVARIANT:
-     * i indicates the first element of the 'greater' category.
+     * i indicates the first element of the 'greater' subarray.
      * j indicates the element we are analysing.
-     * k indicates the first element of the 'equal' category.
-     * j - 1 indicates the last element of the 'greater' category.
+     * k indicates the first element of the 'equal' subarray.
+     * j - 1 indicates the last element of the 'greater' subarray.
      */
     size_t i = p, j = p, k = p;
     while(j < pivot)
     {
         if(compare(array, j, pivot) < 0)
         {
-            // put element in 'less' category
+            // put element in 'less' subarray
             if(i != j)
                 swap(array, i, j);
 
@@ -71,7 +72,7 @@ static Bounds partition3(void *array, size_t p, size_t r,
         {
             if(compare(array, j, pivot) == 0)
             {
-                // put element in 'equal' category
+                // put element in 'equal' subarray
                 if(i != j)
                     swap(array, i, j);
 
@@ -80,7 +81,7 @@ static Bounds partition3(void *array, size_t p, size_t r,
             }
             else
             {
-                // put element in 'greater' categoryy
+                // put element in 'greater' subarrayy
                 j++;
             }
         }
@@ -119,5 +120,5 @@ size_t select(void *array, size_t length, size_t k,
               int (*compare)(const void *, size_t i, size_t j),
               void (*swap)(void *array, size_t i, size_t j))
 {
-    return quick_select(array, 0, length - 1, k, compare, swap);
+    return quick_select(array, 0, length-1, k, compare, swap);
 }
