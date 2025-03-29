@@ -81,7 +81,7 @@ static Bounds partition3(void *array, size_t p, size_t r,
             }
             else
             {
-                // put element in 'greater' subarrayy
+                // put element in 'greater' subarray
                 j++;
             }
         }
