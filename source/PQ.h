@@ -1,5 +1,5 @@
 
-/* Interface for a priority queue. The keys are of type 'void *' and will 
+/* Interface for a priority queue. The keys are of type 'void *' and will
  * be compared using the 'compare' function given as argument to the function
  * pqCreate.
  */
@@ -68,7 +68,7 @@ void *pqGetMax(const PQ* pq);
 
 /* ------------------------------------------------------------------------- *
  * Returns the maximum key currently stored in the priority queue and extracts
- * it from the queue. The queue must contain at least one key (otherwise 
+ * it from the queue. The queue must contain at least one key (otherwise
  * calling the function results in an undefined behavior).
  *
  * PARAMETERS

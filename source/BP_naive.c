@@ -19,7 +19,7 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
     while (p != NULL)
     {
         File *f = llData(p);
-        
+
         Disk *currentDisk = diskCreate(diskSize);
         nbDisks++;
         diskAddFile(currentDisk, f);

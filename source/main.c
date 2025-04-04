@@ -107,7 +107,7 @@ static void printSolution(size_t diskSize, List *files, List *disks)
 int main(int argc, char *argv[])
 {
     // srand(time(NULL));
-    
+
     srand(42);
 
     if (argc != 3)
