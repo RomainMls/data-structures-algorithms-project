@@ -1,5 +1,6 @@
 
 #include "PQ.h"
+#include <stdlib.h>
 
 // Placez ici votre implémentation de la file à priorité
 
@@ -13,17 +14,19 @@ struct PQ_t
 
 PQ *pqCreate(size_t capacity, int (*compare)(const void *, const void *))
 {
-    PQ *ptr = malloc(sizeof(PQ));
-    if(ptr == NULL)
+    PQ *newPQ = malloc(sizeof(PQ));
+    if(newPQ == NULL)
         return NULL;
 
-    ptr->array = malloc(capacity * sizeof(void *));
-    if(ptr->array == NULL)
+    newPQ->array = malloc(capacity * sizeof(void *));
+    if(newPQ->array == NULL)
         return NULL;
 
-    ptr->capacity = capacity;
-    ptr->size = 0;
-    ptr->compare = compare;
+    newPQ->capacity = capacity;
+    newPQ->size = 0;
+    newPQ->compare = compare;
+
+    return newPQ;
 }
 
 void pqFree(PQ* pq)
@@ -33,6 +36,9 @@ void pqFree(PQ* pq)
 
 bool pqInsert(PQ* pq, void *key)
 {
+    if(pq->size >= pq->capacity)
+        return false;
+
     pq->size++;
     size_t i = pq->size - 1;
     pq->array[i] = key;
@@ -45,6 +51,8 @@ bool pqInsert(PQ* pq, void *key)
 
         i = i/2;
     }
+
+    return true;
 }
 
 void *pqGetMax(const PQ* pq)
