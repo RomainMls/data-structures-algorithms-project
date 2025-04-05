@@ -196,7 +196,6 @@ bool avl_insert(AVL_tree *tree, void *key)
             y->right = z;
     }
 
-    // Update minimum pointer if needed
     if(MAINTAIN_MIN) {
         if(tree->min == NULL || tree->compare(key, tree->min->key) < 0) {
             tree->min = z;
