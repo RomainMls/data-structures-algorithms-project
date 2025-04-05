@@ -37,9 +37,21 @@ static List *readFiles(char *filename)
     {
         if (strlen(line) <= 1)
             continue;
-        char *name = strdup(strtok(line, ","));
+            
+        //Strdup did not work, so I remplace it by malloc + strcpy
+        char *name = strtok(line, ",");
         size_t size = strtoull(strtok(NULL, ",\n"), NULL, 10);
-        File *file = fileCreate(name, size);
+
+        char *name_copy = malloc(strlen(name) + 1);
+        if (!name_copy)
+        {
+            fprintf(stderr, "Memory allocation failed for file name\n");
+            return NULL;
+        }
+    
+        strcpy(name_copy, name);
+    
+        File *file = fileCreate(name_copy, size);
         llInsertLast(files, file);
     }
     return files;
@@ -53,7 +65,17 @@ static List *generateRandomFiles(size_t diskSize, size_t nbFiles)
     for (size_t i = 0; i < nbFiles; i++)
     {
         sprintf(buffer, "f%zu", i);
-        File *f = fileCreate(strdup(buffer), rand() % diskSize + 1);
+
+        //Strdup did not work, so I remplace it by malloc + strcpy
+        char *name_copy = malloc(strlen(buffer) + 1);
+        if(!name_copy){
+            fprintf(stderr, "Memory allocation failed for file name\n");
+            return NULL;
+        }
+
+        strcpy(name_copy, buffer);
+
+        File *f = fileCreate(name_copy, rand() % diskSize + 1);
         llInsertLast(files, f);
     }
     return files;
