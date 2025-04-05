@@ -30,7 +30,6 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
 
         if(fileSize(f) <= diskFreeSpace(currentDisk)){
             diskAddFile(currentDisk, f);
-
         } else {
             llInsertLast(disks, currentDisk);
             currentDisk = diskCreate(diskSize);
@@ -41,5 +40,5 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
         p = llNext(p);
     }
 
-    return 0;
+    return nbDisks;
 }
