@@ -39,6 +39,7 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
             llInsertLast(disks, currentDisk);
             currentDisk = diskCreate(diskSize);
             nbDisks++;
+            diskAddFile(currentDisk, f);
         }
 
         p = llNext(p);
