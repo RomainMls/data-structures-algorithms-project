@@ -31,13 +31,12 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
         if(fileSize(f) <= diskFreeSpace(currentDisk)){
             diskAddFile(currentDisk, f);
         } else {
-            llInsertLast(disks, currentDisk);
-            currentDisk = diskCreate(diskSize);
-
             //The file cannot be save on a disk, return error
             if(fileSize(f) > diskSize)
-                return NULL;
-
+                return 0;
+            
+            llInsertLast(disks, currentDisk);
+            currentDisk = diskCreate(diskSize);
             nbDisks++;
             diskAddFile(currentDisk, f);
         }
