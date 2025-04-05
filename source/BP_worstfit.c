@@ -29,7 +29,7 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
     Disk *d = diskCreate(diskSize);
 
     pqInsert(pq, d);
-    
+
     size_t nbDisks = 1;
 
     Node *p = llHead(files);
@@ -54,7 +54,7 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
             pqInsert(pq, newDisk);
             llInsertLast(disks, newDisk);
             nbDisks++;
-            
+
             diskAddFile(newDisk, f);
         }
         p = llNext(p);

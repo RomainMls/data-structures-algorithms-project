@@ -504,3 +504,4 @@ void *avl_get_min(AVL_tree *tree)
 {
     return tree->min->key;
 }
+
