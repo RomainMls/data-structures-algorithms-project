@@ -41,7 +41,8 @@ bool pqInsert(PQ* pq, void *key)
     size_t i = pq->size - 1;
     pq->array[i] = key;
 
-    while(i > 0 && pq->array[i/2] < pq->array[i])       // i/2 is the parent of i
+    // max heapify
+    while(i > 0 && pq->compare(pq->array[i/2], pq->array[i])  < 0)       // i/2 is the parent of i
     {
         void *temp = pq->array[i/2];
         pq->array[i/2] = pq->array[i];

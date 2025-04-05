@@ -17,4 +17,6 @@ bool avl_delete(AVL_tree *tree, void *key);
 
 void *avl_find(AVL_tree *tree, void *key);
 
+void *avl_successor(AVL_tree *tree, void *key);
+
 #endif // BST_BESTFIT_H_DEFINED

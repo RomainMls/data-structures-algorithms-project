@@ -16,34 +16,34 @@ typedef enum
 }
 Balance_Factor;
 
-typedef struct Node
+typedef struct BST_Node
 {
     void *key;
-    struct Node *parent;
-    struct Node *left;
-    struct Node *right;
+    struct BST_Node *parent;
+    struct BST_Node *left;
+    struct BST_Node *right;
     Balance_Factor bf;
 }
-Node;
+BST_Node;
 
 struct AVL_tree_t
 {
-    Node *root;
-    Node *min;
+    BST_Node *root;
+    BST_Node *min;
     int (*compare)(const void *, const void *);
     void (*freeKey)(void *);
 };
 
-static void free_subtree(AVL_tree *tree, Node *root);
-static int subtree_height(Node *root);
+static void free_subtree(AVL_tree *tree, BST_Node *root);
+static int subtree_height(BST_Node *root);
 static int max(int a, int b);
-static Node *find_node(AVL_tree *tree, void *key);
-static Node *avl_successor(AVL_tree *tree, Node *node);
-static int calculate_balance_factor(Node *x);
-static void transplant(AVL_tree *tree, Node *a, Node *b);
-static void tree_delete(AVL_tree *tree, Node *z);
-static Node *left_rotate(AVL_tree *tree, Node *x);
-static Node *right_rotate(AVL_tree *tree, Node *x);
+static BST_Node *find_node(AVL_tree *tree, void *key);
+static BST_Node *avl_successor_node(AVL_tree *tree, BST_Node *node);
+static int calculate_balance_factor(BST_Node *x);
+static void transplant(AVL_tree *tree, BST_Node *a, BST_Node *b);
+static void tree_delete(AVL_tree *tree, BST_Node *z);
+static BST_Node *left_rotate(AVL_tree *tree, BST_Node *x);
+static BST_Node *right_rotate(AVL_tree *tree, BST_Node *x);
 static void update_min(AVL_tree *tree);
 static void *avl_find_min(AVL_tree *tree);
 
@@ -67,7 +67,7 @@ void free_avl(AVL_tree *tree)
     free(tree);
 }
 
-static void free_subtree(AVL_tree *tree, Node *root)
+static void free_subtree(AVL_tree *tree, BST_Node *root)
 {
     if(root == NULL)
         return;
@@ -84,7 +84,7 @@ int avl_height(AVL_tree *tree)
     return subtree_height(tree->root);
 }
 
-static int subtree_height(Node *root)
+static int subtree_height(BST_Node *root)
 {
     if(root == NULL)
         return 0;
@@ -100,9 +100,9 @@ static int max(int a, int b)
     return b;
 }
 
-static Node *find_node(AVL_tree *tree, void *key)
+static BST_Node *find_node(AVL_tree *tree, void *key)
 {
-    Node *ptr = tree->root;
+    BST_Node *ptr = tree->root;
 
     while(ptr != NULL)
     {
@@ -119,9 +119,9 @@ static Node *find_node(AVL_tree *tree, void *key)
     return NULL;
 }
 
-static Node *avl_successor(AVL_tree *tree, Node *node)
+static BST_Node *avl_successor_node(AVL_tree *tree, BST_Node *node)
 {
-    Node *ptr = node->right;
+    BST_Node *ptr = node->right;
 
     if(ptr != NULL) {
         while(ptr->left != NULL)
@@ -131,7 +131,7 @@ static Node *avl_successor(AVL_tree *tree, Node *node)
     else
     {
         ptr = node->parent;
-        Node *current = node;
+        BST_Node *current = node;
 
         while(ptr != NULL && current == ptr->right)
         {
@@ -143,6 +143,34 @@ static Node *avl_successor(AVL_tree *tree, Node *node)
     }
 }
 
+void *avl_successor(AVL_tree *tree, void *key)
+{
+    if (tree == NULL || key == NULL)
+        return NULL;
+
+    // First, find the node for the given key
+    BST_Node *current = tree->root;
+    BST_Node *successor = NULL;
+
+    while (current != NULL)
+    {
+        int cmp = tree->compare(key, current->key);
+
+        if (cmp < 0)
+        {
+            // Current node's key is larger than our key,
+            // so it's a potential successor
+            successor = current;
+            current = current->left;
+        }
+        else
+            // Either equal or smaller, go right
+            current = current->right;
+    }
+
+    return successor->key;
+}
+
 static void update_min(AVL_tree *tree)
 {
     if (tree->root == NULL)
@@ -151,7 +179,7 @@ static void update_min(AVL_tree *tree)
         return;
     }
 
-    Node *current = tree->root;
+    BST_Node *current = tree->root;
     while(current->left != NULL)
         current = current->left;
 
@@ -160,9 +188,9 @@ static void update_min(AVL_tree *tree)
 
 bool avl_insert(AVL_tree *tree, void *key)
 {
-    Node *y = NULL;
-    Node *x = tree->root;
-    Node *z = malloc(sizeof(Node));
+    BST_Node *y = NULL;
+    BST_Node *x = tree->root;
+    BST_Node *z = malloc(sizeof(BST_Node));
     if(z == NULL)
         return false;
 
@@ -204,7 +232,7 @@ bool avl_insert(AVL_tree *tree, void *key)
             tree->min = z;
 
     // now we need to rebalance from the z to the root
-    Node *n = z->parent;
+    BST_Node *n = z->parent;
     while(n != NULL)
     {
         Balance_Factor bf = calculate_balance_factor(n);
@@ -237,24 +265,23 @@ bool avl_insert(AVL_tree *tree, void *key)
 
 bool avl_delete(AVL_tree *tree, void *key)
 {
-    Node *z = find_node(tree, key);
+    BST_Node *z = find_node(tree, key);
     if(z == NULL)
         return false;
 
     // Save parent node to start rebalancing from
-    Node *parent = z->parent;
+    BST_Node *parent = z->parent;
 
     tree_delete(tree, z);
     tree->freeKey(z->key);
     free(z);
 
     // Update minimum if necessary
-    if(MAINTAIN_MIN) {
+    if(MAINTAIN_MIN)
         update_min(tree);
-    }
 
     // Rebalance the tree from the parent node upward
-    Node *n = parent;
+    BST_Node *n = parent;
     while(n != NULL)
     {
         Balance_Factor bf = calculate_balance_factor(n);
@@ -285,7 +312,7 @@ bool avl_delete(AVL_tree *tree, void *key)
     return true;
 }
 
-static int calculate_balance_factor(Node *x)
+static int calculate_balance_factor(BST_Node *x)
 {
     if(x == NULL)
         return BALANCED;
@@ -293,7 +320,7 @@ static int calculate_balance_factor(Node *x)
     return subtree_height(x->right) - subtree_height(x->left);
 }
 
-static void transplant(AVL_tree *tree, Node *a, Node *b)
+static void transplant(AVL_tree *tree, BST_Node *a, BST_Node *b)
 {
     if(a->parent == NULL)
         tree->root = b;
@@ -308,7 +335,7 @@ static void transplant(AVL_tree *tree, Node *a, Node *b)
         b->parent = a->parent;
 }
 
-static void tree_delete(AVL_tree *tree, Node *z)
+static void tree_delete(AVL_tree *tree, BST_Node *z)
 {
     if(z->left == NULL)
         transplant(tree, z, z->right);
@@ -318,7 +345,7 @@ static void tree_delete(AVL_tree *tree, Node *z)
             transplant(tree, z, z->left);
         else
         {
-            Node *y = avl_successor(tree, z);
+            BST_Node *y = avl_successor_node(tree, z);
             if(y->parent != z)
             {
                 transplant(tree, y, y->right);
@@ -332,12 +359,12 @@ static void tree_delete(AVL_tree *tree, Node *z)
     }
 }
 
-static Node *left_rotate(AVL_tree *tree, Node *x)
+static BST_Node *left_rotate(AVL_tree *tree, BST_Node *x)
 {
     if(x == NULL || x->right == NULL)
         return x;
 
-    Node *y = x->right;
+    BST_Node *y = x->right;
 
     // Update parent pointers
     y->parent = x->parent;
@@ -366,12 +393,12 @@ static Node *left_rotate(AVL_tree *tree, Node *x)
     return y;
 }
 
-static Node *right_rotate(AVL_tree *tree, Node *x)
+static BST_Node *right_rotate(AVL_tree *tree, BST_Node *x)
 {
     if(x == NULL || x->left == NULL)
         return x;
 
-    Node *y = x->left;
+    BST_Node *y = x->left;
 
     // Update parent pointers
     y->parent = x->parent;
@@ -408,7 +435,7 @@ static void *avl_find_min(AVL_tree *tree)
     if(tree->root == NULL)
         return NULL;
 
-    Node *current = tree->root;
+    BST_Node *current = tree->root;
     while(current->left != NULL)
         current = current->left;
 
@@ -417,6 +444,11 @@ static void *avl_find_min(AVL_tree *tree)
 
 void *avl_find(AVL_tree *tree, void *key)
 {
-    Node *node = find_node(tree, key);
+    BST_Node *node = find_node(tree, key);
     return node != NULL ? node->key : NULL;
+}
+
+void *avl_get_min(AVL_tree *tree)
+{
+    return tree->min->key;
 }
