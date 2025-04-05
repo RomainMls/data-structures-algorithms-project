@@ -3,14 +3,16 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define ALLOW_DUPLICATES true
+#define ALLOW_DUPLICATES false
 #define MAINTAIN_MIN true
 
 typedef enum
 {
+    LEFTIMBALANCE = -2,
     LEFTHEAVY = -1,
     BALANCED = 0,
-    RIGHTHEAVY = 1
+    RIGHTHEAVY = 1,
+    RIGHTIMBALANCE = 2
 }
 Balance_Factor;
 
@@ -143,15 +145,16 @@ static Node *avl_successor(AVL_tree *tree, Node *node)
 
 static void update_min(AVL_tree *tree)
 {
-    if (tree->root == NULL) {
+    if (tree->root == NULL)
+    {
         tree->min = NULL;
         return;
     }
 
     Node *current = tree->root;
-    while (current->left != NULL) {
+    while(current->left != NULL)
         current = current->left;
-    }
+
     tree->min = current;
 }
 
@@ -196,20 +199,17 @@ bool avl_insert(AVL_tree *tree, void *key)
             y->right = z;
     }
 
-    if(MAINTAIN_MIN) {
-        if(tree->min == NULL || tree->compare(key, tree->min->key) < 0) {
+    if(MAINTAIN_MIN)
+        if(tree->min == NULL || tree->compare(key, tree->min->key) < 0)
             tree->min = z;
-        }
-    }
 
     // now we need to rebalance from the z to the root
     Node *n = z->parent;
     while(n != NULL)
     {
-        // recalculate balance factor
         Balance_Factor bf = calculate_balance_factor(n);
 
-        if(bf == RIGHTHEAVY + 1) // +2 balance factor
+        if(bf == RIGHTIMBALANCE)
         {
             if(calculate_balance_factor(n->right) >= BALANCED)
                 n = left_rotate(tree, n);
@@ -219,7 +219,7 @@ bool avl_insert(AVL_tree *tree, void *key)
                 n = left_rotate(tree, n);
             }
         }
-        else if(bf == LEFTHEAVY - 1) // -2 balance factor
+        else if(bf == LEFTIMBALANCE)
         {
             if(calculate_balance_factor(n->left) <= BALANCED)
                 n = right_rotate(tree, n);
@@ -259,7 +259,7 @@ bool avl_delete(AVL_tree *tree, void *key)
     {
         Balance_Factor bf = calculate_balance_factor(n);
 
-        if(bf == RIGHTHEAVY + 1) // +2 balance factor
+        if(bf == RIGHTIMBALANCE)
         {
             if(calculate_balance_factor(n->right) >= BALANCED)
                 n = left_rotate(tree, n);
@@ -269,7 +269,7 @@ bool avl_delete(AVL_tree *tree, void *key)
                 n = left_rotate(tree, n);
             }
         }
-        else if(bf == LEFTHEAVY - 1) // -2 balance factor
+        else if(bf == LEFTIMBALANCE)
         {
             if(calculate_balance_factor(n->left) <= BALANCED)
                 n = right_rotate(tree, n);
@@ -312,20 +312,23 @@ static void tree_delete(AVL_tree *tree, Node *z)
 {
     if(z->left == NULL)
         transplant(tree, z, z->right);
-    else if(z->right == NULL)
-        transplant(tree, z, z->left);
     else
     {
-        Node *y = avl_successor(tree, z);
-        if(y->parent != z)
+        if(z->right == NULL)
+            transplant(tree, z, z->left);
+        else
         {
-            transplant(tree, y, y->right);
-            y->right = z->right;
-            y->right->parent = y;
+            Node *y = avl_successor(tree, z);
+            if(y->parent != z)
+            {
+                transplant(tree, y, y->right);
+                y->right = z->right;
+                y->right->parent = y;
+            }
+            transplant(tree, z, y);
+            y->left = z->left;
+            y->left->parent = y;
         }
-        transplant(tree, z, y);
-        y->left = z->left;
-        y->left->parent = y;
     }
 }
 
@@ -340,7 +343,8 @@ static Node *left_rotate(AVL_tree *tree, Node *x)
     y->parent = x->parent;
     if(x->parent == NULL)
         tree->root = y;
-    else {
+    else
+    {
         if(x == x->parent->left)
             x->parent->left = y;
         else
@@ -373,7 +377,8 @@ static Node *right_rotate(AVL_tree *tree, Node *x)
     y->parent = x->parent;
     if(x->parent == NULL)
         tree->root = y;
-    else {
+    else
+    {
         if(x == x->parent->left)
             x->parent->left = y;
         else
@@ -414,4 +419,4 @@ void *avl_find(AVL_tree *tree, void *key)
 {
     Node *node = find_node(tree, key);
     return node != NULL ? node->key : NULL;
-}
+}j
