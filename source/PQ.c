@@ -1,8 +1,6 @@
-
 #include "PQ.h"
-#include <stdlib.h>
 
-// Placez ici votre implémentation de la file à priorité
+#include <stdlib.h>
 
 struct PQ_t
 {
