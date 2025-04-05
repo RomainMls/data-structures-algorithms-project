@@ -18,16 +18,16 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
     if(avl == NULL)
         return (size_t)(-1);
 
-    Node *currentNode;
+    Node *currentNode = llHead(files);
     File *currentFile;
     Disk *diskToStoreIn;
     int count = 0;
-    while((currentNode = llPopFirst(files)) != NULL)
+    while(currentNode != NULL)
     {
         currentFile = llData(currentNode);
 
-        Disk *fakeDisk = diskCreate(fileSize(currentFile));     // fake disk that would be the best fit
-        diskAddFile(fakeDisk, currentFile);
+        Disk *fakeDisk = diskCreate(fileSize(currentFile) - 1);     // fake disk that would be the best fit
+
         diskToStoreIn = avl_successor(avl, fakeDisk);  // disk of minimum free size that can store our file
         if(diskToStoreIn == NULL)
         {
@@ -46,6 +46,8 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
         diskAddFile(diskToStoreIn, currentFile);
         avl_insert(avl, diskToStoreIn);
         diskFree(fakeDisk);
+
+        currentNode = llNext(currentNode);
     }
 
     return count;

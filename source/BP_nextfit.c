@@ -34,7 +34,7 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
             //The file cannot be save on a disk, return error
             if(fileSize(f) > diskSize)
                 return 0;
-            
+
             llInsertLast(disks, currentDisk);
             currentDisk = diskCreate(diskSize);
             nbDisks++;
@@ -43,7 +43,7 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
 
         p = llNext(p);
     }
-    
+
     llInsertLast(disks, currentDisk);
     return nbDisks;
 }
