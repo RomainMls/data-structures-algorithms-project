@@ -17,7 +17,6 @@ static int compare(const void *a, const void *b){
 size_t binpacking(size_t diskSize, List *files, List *disks)
 {
     llSort(files, compare);
-    fprintf(stderr, "%zu\n", fileSize(llData(llHead(files))));
     if(llLength(files) == 0)
         return 0;
 
