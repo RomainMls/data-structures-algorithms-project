@@ -37,7 +37,7 @@ static List *readFiles(char *filename)
     {
         if (strlen(line) <= 1)
             continue;
-            
+
         //Strdup did not work, so I remplace it by malloc + strcpy
         char *name = strtok(line, ",");
         size_t size = strtoull(strtok(NULL, ",\n"), NULL, 10);
@@ -48,9 +48,9 @@ static List *readFiles(char *filename)
             fprintf(stderr, "Memory allocation failed for file name\n");
             return NULL;
         }
-    
+
         strcpy(name_copy, name);
-    
+
         File *file = fileCreate(name_copy, size);
         llInsertLast(files, file);
     }

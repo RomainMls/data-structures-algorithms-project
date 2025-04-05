@@ -13,10 +13,14 @@ int avl_height(AVL_tree *tree);
 
 bool avl_insert(AVL_tree *tree, void *key);
 
-bool avl_delete(AVL_tree *tree, void *key);
+bool avl_delete_with_free(AVL_tree *tree, void *key);
+
+bool avl_delete_without_free(AVL_tree *tree, void *key);
 
 void *avl_find(AVL_tree *tree, void *key);
 
 void *avl_successor(AVL_tree *tree, void *key);
+
+void *avl_get_min(AVL_tree *tree);
 
 #endif // BST_BESTFIT_H_DEFINED
