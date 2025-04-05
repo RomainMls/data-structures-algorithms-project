@@ -11,17 +11,14 @@
 */
 
 static int compare(const void *a, const void *b){
-    File *n1 = llData((Node *)a);
-    File *n2 = llData((Node *)b);
-
-    return (fileSize(n1) - fileSize(n2));
+    return (fileSize((File *)b) - fileSize((File *)a));
 }
 
 size_t binpacking(size_t diskSize, List *files, List *disks)
 {
     llSort(files, compare);
-
-    if(llLength == 0)
+    fprintf(stderr, "%zu\n", fileSize(llData(llHead(files))));
+    if(llLength(files) == 0)
         return 0;
 
     Disk *currentDisk = diskCreate(diskSize);
