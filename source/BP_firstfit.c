@@ -11,7 +11,7 @@
     Implementation of the First-Fit strategy
 */
 
-int reverse_file_compare(const void *a, const void *b)
+static int reverse_file_compare(const void *a, const void *b)
 {
     return -compareFileSize(a, b);
 }
@@ -22,9 +22,9 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
     if(llLength(files) == 0)
         return 0;
 
-    AVL_tree *avl = create_avl();
+    AVL_tree *avl = avl_create();
     if(avl == NULL)
-        return NULL;
+        return (size_t)(0);
 
     size_t counter = 0;
     Node *currentNode = llHead(files);

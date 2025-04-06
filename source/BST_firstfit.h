@@ -6,15 +6,13 @@
 
 typedef struct AVL_tree_t AVL_tree;
 
-AVL_tree *create_avl();
+AVL_tree *avl_create();
 
-void free_avl(AVL_tree *tree);
+void avl_free(AVL_tree *tree);
 
 int avl_height(AVL_tree *tree);
 
 bool avl_insert(AVL_tree *tree, Disk *disk);
-
-void *avl_get_min(AVL_tree *tree);
 
 Disk *tree_search_ff(AVL_tree *tree, size_t size);
 

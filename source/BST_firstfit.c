@@ -2,7 +2,6 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
-#include <stdio.h>
 
 #define ALLOW_DUPLICATES false
 
@@ -34,7 +33,7 @@ struct AVL_tree_t
     int counter;
 };
 
-AVL_tree *create_avl()
+AVL_tree *avl_create()
 {
     AVL_tree *tree = malloc(sizeof(AVL_tree));
     if(tree == NULL)
@@ -58,7 +57,7 @@ static void free_subtree(AVL_tree *tree, BST_Node *root)
     free(root);
 }
 
-void free_avl(AVL_tree *tree)
+void avl_free(AVL_tree *tree)
 {
     free_subtree(tree, tree->root);
     free(tree);
@@ -93,7 +92,7 @@ static int calculate_balance_factor(BST_Node *x)
     return subtree_height(x->right) - subtree_height(x->left);
 }
 
-size_t restore_sub_max(AVL_tree *tree, BST_Node *n)
+static size_t restore_sub_max(AVL_tree *tree, BST_Node *n)
 {
     if(n == NULL)
         return 0;
@@ -161,21 +160,6 @@ size_t restore_sub_max(AVL_tree *tree, BST_Node *n)
             return rightMax;
         }
     }
-}
-
-static void transplant(AVL_tree *tree, BST_Node *a, BST_Node *b)
-{
-    if(a->parent == NULL)
-        tree->root = b;
-    else
-    {
-        if(a == a->parent->left)
-            a->parent->left = b;
-        else
-            a->parent->right = b;
-    }
-    if(b != NULL)
-        b->parent = a->parent;
 }
 
 static BST_Node *left_rotate(AVL_tree *tree, BST_Node *x)
