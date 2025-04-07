@@ -19,6 +19,7 @@ static int reverse_file_compare(const void *a, const void *b)
 size_t binpacking(size_t diskSize, List *files, List *disks)
 {
     llSort(files, reverse_file_compare);        // sorted in decreasing
+
     AVL_tree *avl = avl_create();
     if(avl == NULL)
         return (size_t)(0);
@@ -26,12 +27,16 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
     Node *currentNode = llHead(files);
     File *currentFile;
     Disk *diskToStoreIn;
-    int count = 0;
+    size_t counter = 0;
+
     while(currentNode != NULL)
     {
         currentFile = llData(currentNode);
-        if(fileSize(currentFile) > diskSize)
+        size_t size = fileSize(currentFile);
+        if(size > diskSize)
         {
+            printf("File size larger than disks' sizes\n");
+            avl_free_without_freeDisk(avl);
             while(llPopFirst(disks) != NULL);   // reset disks list to match the 0
             return (size_t)(0);
         }
@@ -43,11 +48,11 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
             diskToStoreIn = diskCreate(diskSize);
             if(diskToStoreIn == NULL)
             {
-                free(avl);
+                avl_free_without_freeDisk(avl);
                 while(llPopFirst(disks) != NULL);   // reset disks list to match the 0
                 return (size_t)(0);
             }
-            count++;
+            counter++;
             avl_insert(avl, diskToStoreIn);
             llInsertLast(disks, diskToStoreIn);
         }
@@ -58,5 +63,5 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
         currentNode = llNext(currentNode);
     }
 
-    return count;
+    return counter;
 }

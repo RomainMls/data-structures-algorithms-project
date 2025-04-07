@@ -70,21 +70,38 @@ AVL_tree *avl_create(void)
     return tree;
 }
 
-static void free_subtree(AVL_tree *tree, BST_Node *root)
+static void free_subtree_with_freeDisk(AVL_tree *tree, BST_Node *root)
 {
     if(root == NULL)
         return;
 
-    free_subtree(tree, root->left);
-    free_subtree(tree, root->right);
+    free_subtree_with_freeDisk(tree, root->left);
+    free_subtree_with_freeDisk(tree, root->right);
 
     diskFree(root->disk);
     free(root);
 }
 
-void avl_free(AVL_tree *tree)
+static void free_subtree_without_freeDisk(AVL_tree *tree, BST_Node *root)
 {
-    free_subtree(tree, tree->root);
+    if(root == NULL)
+        return;
+
+    free_subtree_without_freeDisk(tree, root->left);
+    free_subtree_without_freeDisk(tree, root->right);
+
+    free(root);
+}
+
+void avl_free_with_freeDisk(AVL_tree *tree)
+{
+    free_subtree_with_freeDisk(tree, tree->root);
+    free(tree);
+}
+
+void avl_free_without_freeDisk(AVL_tree *tree)
+{
+    free_subtree_without_freeDisk(tree, tree->root);
     free(tree);
 }
 

@@ -10,7 +10,9 @@ AVL_tree *avl_create(void);
 
 void avl_print(AVL_tree *tree);
 
-void avl_free(AVL_tree *tree);
+void avl_free_without_freeDisk(AVL_tree *tree);
+
+void avl_free_with_freeDisk(AVL_tree *tree);
 
 int avl_height(AVL_tree *tree);
 
