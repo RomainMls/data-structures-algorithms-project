@@ -55,7 +55,6 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
                 while(llPopFirst(disks) != NULL);
                 return (size_t)(0);
             }
-            //printf("New disk\n");
             avl_insert(avl, diskToStoreIn);
             counter++;
             llInsertLast(disks, diskToStoreIn);
