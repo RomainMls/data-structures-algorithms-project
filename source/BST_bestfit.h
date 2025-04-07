@@ -6,7 +6,7 @@
 
 typedef struct AVL_tree_t AVL_tree;
 
-AVL_tree *avl_create();
+AVL_tree *avl_create(void);
 
 void avl_free_with_freeDisk(AVL_tree *tree);
 

@@ -1,8 +1,8 @@
-#include "BST_firstfit.h"
-
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
+
+#include "BST_firstfit.h"
 
 #define ALLOW_DUPLICATES false
 
@@ -58,7 +58,7 @@ void avl_print(AVL_tree *tree)
         print_node_r(tree->root);
 }
 
-AVL_tree *avl_create()
+AVL_tree *avl_create(void)
 {
     AVL_tree *tree = malloc(sizeof(AVL_tree));
     if(tree == NULL)

@@ -1,7 +1,7 @@
-#include "BST_bestfit.h"
-
 #include <stdlib.h>
 #include <stdbool.h>
+
+#include "BST_bestfit.h"
 
 typedef enum
 {
@@ -28,7 +28,7 @@ struct AVL_tree_t
     BST_Node *root;
 };
 
-AVL_tree *avl_create()
+AVL_tree *avl_create(void)
 {
     AVL_tree *tree = malloc(sizeof(AVL_tree));
     if(tree == NULL)
@@ -481,4 +481,3 @@ Disk *tree_search_bf(AVL_tree *tree, size_t size)
 
     return successor->disk;
 }
-
