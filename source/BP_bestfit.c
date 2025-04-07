@@ -1,12 +1,12 @@
 
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "BP.h"
 #include "Disk.h"
 #include "File.h"
 #include "LinkedList.h"
 #include "BST_bestfit.h"
-#include <stdlib.h>
 /*
     Implementation of the Best-Fit strategy
 */

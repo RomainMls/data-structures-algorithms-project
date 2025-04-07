@@ -1,13 +1,12 @@
 
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "BP.h"
 #include "Disk.h"
 #include "File.h"
 #include "LinkedList.h"
 #include "BST_firstfit.h"
-#include <stdio.h>
-
 /*
     Implementation of the First-Fit strategy
 */
