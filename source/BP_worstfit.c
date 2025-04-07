@@ -15,17 +15,13 @@ static int compare(const void *a, const void *b){
     return (fileSize((File *)b) - fileSize((File *)a));
 }
 
-static int compareDisks(const void *a, const void *b){
-    return (diskFreeSpace((Disk *)a) - diskFreeSpace((Disk *)b));
-}
-
 size_t binpacking(size_t diskSize, List *files, List *disks)
 {
     llSort(files, compare);
     if(llLength(files) == 0)
         return 0;
 
-    PQ *pq = pqCreate(llLength(files), compareDisks);
+    PQ *pq = pqCreate(llLength(files), compareDiskFreeSpace);
     Disk *d = diskCreate(diskSize);
 
     pqInsert(pq, d);

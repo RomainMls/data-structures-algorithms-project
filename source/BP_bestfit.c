@@ -48,9 +48,8 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
             diskToStoreIn = diskCreate(diskSize);
             if(diskToStoreIn == NULL)
             {
-                avl_free_without_freeDisk(avl);
-                while(llPopFirst(disks) != NULL);   // reset disks list to match the 0
-                return (size_t)(0);
+                printf("BP_bestfit: allocation error.\n");
+                exit(1);
             }
             counter++;
             avl_insert(avl, diskToStoreIn);
@@ -63,5 +62,6 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
         currentNode = llNext(currentNode);
     }
 
+    avl_free_without_freeDisk(avl);
     return counter;
 }
