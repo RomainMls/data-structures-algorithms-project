@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #define ALLOW_DUPLICATES false
 
@@ -27,11 +28,35 @@ typedef struct BST_Node
 }
 BST_Node;
 
+static void print_node(BST_Node *node)
+{
+    printf("Node of priority: %d, selfFreeSpace: %zu, subMax: %zu, BF: %d\n", node->priority, diskFreeSpace(node->disk), node->subMax, node->bf);
+}
+
+static void print_node_r(BST_Node *node)
+{
+    print_node(node);
+    if(node->left != NULL)
+    {
+        printf("The follwing is its left\n");
+        print_node_r(node->left);
+    }
+
+    if(node->right != NULL)
+        print_node_r(node->right);
+}
+
 struct AVL_tree_t
 {
     BST_Node *root;
     int counter;
 };
+
+void avl_print(AVL_tree *tree)
+{
+    if(tree->root != NULL)
+        print_node_r(tree->root);
+}
 
 AVL_tree *avl_create()
 {
@@ -317,4 +342,9 @@ static Disk *tree_search_ff_node(BST_Node *root, size_t size)
 Disk *tree_search_ff(AVL_tree *tree, size_t size)
 {
     return tree_search_ff_node(tree->root, size);
+}
+
+int avl_restore_sub_max(AVL_tree *tree)
+{
+    return restore_sub_max(tree, tree->root);
 }

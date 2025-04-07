@@ -35,9 +35,8 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
             while(llPopFirst(disks) != NULL);   // reset disks list to match the 0
             return (size_t)(0);
         }
-        Disk *fakeDisk = diskCreate(fileSize(currentFile) - 1);     // fake disk that would be the best fit
 
-        diskToStoreIn = avl_successor(avl, fakeDisk);  // disk of minimum free size that can store our file
+        diskToStoreIn = tree_search_bf(avl, fileSize(currentFile));
         if(diskToStoreIn == NULL)
         {
             // No disk can store the file, therefore add a new disk
@@ -55,7 +54,6 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
         avl_delete_without_free(avl, diskToStoreIn);
         diskAddFile(diskToStoreIn, currentFile);
         avl_insert(avl, diskToStoreIn);
-        diskFree(fakeDisk);
 
         currentNode = llNext(currentNode);
     }

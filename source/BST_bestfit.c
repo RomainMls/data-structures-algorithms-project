@@ -454,3 +454,31 @@ Disk *avl_find(AVL_tree *tree, Disk *d)
     return node->disk;
 }
 
+Disk *tree_search_bf(AVL_tree *tree, size_t size)
+{
+    if (tree == NULL)
+        return NULL;
+
+    BST_Node *current = tree->root;
+    BST_Node *successor = NULL;
+    while (current != NULL)
+    {
+        int cmp = size - diskFreeSpace(current->disk);
+        if (cmp < 0)
+        {
+            // Current node's key is larger than our key,
+            // so it's a potential successor
+            successor = current;
+            current = current->left;
+        }
+        else
+            // Either equal or smaller, go right
+            current = current->right;
+    }
+
+    if(successor == NULL)
+        return NULL;
+
+    return successor->disk;
+}
+

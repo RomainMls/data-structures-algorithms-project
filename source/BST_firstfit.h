@@ -8,6 +8,8 @@ typedef struct AVL_tree_t AVL_tree;
 
 AVL_tree *avl_create();
 
+void avl_print(AVL_tree *tree);
+
 void avl_free(AVL_tree *tree);
 
 int avl_height(AVL_tree *tree);
@@ -15,5 +17,7 @@ int avl_height(AVL_tree *tree);
 bool avl_insert(AVL_tree *tree, Disk *disk);
 
 Disk *tree_search_ff(AVL_tree *tree, size_t size);
+
+int avl_restore_sub_max(AVL_tree *tree);
 
 #endif // BST_BESTFIT_H_DEFINED
