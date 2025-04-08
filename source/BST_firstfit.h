@@ -20,4 +20,6 @@ Disk *tree_search_ff(AVL_tree *tree, size_t size);
 
 void avl_restore_sub_max(AVL_tree *tree);
 
+bool detect_imbalance(AVL_tree *tree);
+
 #endif // BST_FIRSTFIT_H_DEFINED

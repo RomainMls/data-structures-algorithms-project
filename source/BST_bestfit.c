@@ -444,3 +444,11 @@ Disk *tree_search_bf(AVL_tree *tree, size_t size)
 
     return successor->disk;
 }
+
+bool detect_imbalance(AVL_tree *tree)
+{
+    if(abs(calculate_balance_factor(tree->root)) > 1)
+        return true;
+
+    return false;
+}

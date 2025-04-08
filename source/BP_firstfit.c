@@ -65,9 +65,16 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
         avl_restore_sub_max(avl);
 
         currentNode = llNext(currentNode);
+
+        if(detect_imbalance(avl))
+        {
+            printf("BP_bestfit: imbalance detected\n");
+            exit(1);
+        }
     }
 
     avl_free_without_freeDisk(avl);
     return counter;
 }
+
 

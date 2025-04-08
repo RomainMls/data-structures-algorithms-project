@@ -334,3 +334,11 @@ void avl_restore_sub_max(AVL_tree *tree)
 {
     restore_sub_max(tree, tree->root);
 }
+
+bool detect_imbalance(AVL_tree *tree)
+{
+    if(abs(calculate_balance_factor(tree->root)) > 1)
+        return true;
+
+    return false;
+}
