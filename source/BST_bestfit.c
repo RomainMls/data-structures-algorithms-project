@@ -114,7 +114,7 @@ static BST_Node *find_node(AVL_tree *tree, Disk *d)
     return NULL;
 }
 
-static BST_Node *avl_successor_node(BST_Node *node)
+static BST_Node *avl_successor_node(AVL_tree *tree, BST_Node *node)
 {
     BST_Node *ptr = node->right;
 
@@ -134,37 +134,11 @@ static BST_Node *avl_successor_node(BST_Node *node)
             ptr = ptr->parent;
         }
 
+        if(ptr == tree->root)
+            return NULL;
+
         return ptr;
     }
-}
-
-Disk *avl_successor(AVL_tree *tree, Disk *d)
-{
-    if (tree == NULL || d == NULL)
-        return NULL;
-
-    // First, find the node for the given key
-    BST_Node *current = tree->root;
-    BST_Node *successor = NULL;
-    while (current != NULL)
-    {
-        int cmp = compareDiskFreeSpace(d, current->disk);
-        if (cmp < 0)
-        {
-            // Current node's key is larger than our key,
-            // so it's a potential successor
-            successor = current;
-            current = current->left;
-        }
-        else
-            // Either equal or smaller, go right
-            current = current->right;
-    }
-
-    if(successor == NULL)
-        return NULL;
-
-    return successor->disk;
 }
 
 static int calculate_balance_factor(BST_Node *x)
@@ -182,7 +156,6 @@ static BST_Node *left_rotate(AVL_tree *tree, BST_Node *x)
 
     BST_Node *y = x->right;
 
-    // Update parent pointers
     y->parent = x->parent;
     if(x->parent == NULL)
         tree->root = y;
@@ -194,7 +167,6 @@ static BST_Node *left_rotate(AVL_tree *tree, BST_Node *x)
             x->parent->right = y;
     }
 
-    // Perform rotation
     x->right = y->left;
     if(y->left != NULL)
         y->left->parent = x;
@@ -202,7 +174,6 @@ static BST_Node *left_rotate(AVL_tree *tree, BST_Node *x)
     y->left = x;
     x->parent = y;
 
-    // Update balance factors
     x->bf = calculate_balance_factor(x);
     y->bf = calculate_balance_factor(y);
 
@@ -216,7 +187,6 @@ static BST_Node *right_rotate(AVL_tree *tree, BST_Node *x)
 
     BST_Node *y = x->left;
 
-    // Update parent pointers
     y->parent = x->parent;
     if(x->parent == NULL)
         tree->root = y;
@@ -228,7 +198,6 @@ static BST_Node *right_rotate(AVL_tree *tree, BST_Node *x)
             x->parent->right = y;
     }
 
-    // Perform rotation
     x->left = y->right;
     if(y->right != NULL)
         y->right->parent = x;
@@ -236,7 +205,6 @@ static BST_Node *right_rotate(AVL_tree *tree, BST_Node *x)
     y->right = x;
     x->parent = y;
 
-    // Update balance factors
     x->bf = calculate_balance_factor(x);
     y->bf = calculate_balance_factor(y);
 
@@ -263,7 +231,6 @@ bool avl_insert(AVL_tree *tree, Disk *d)
         int cmp = compareDiskFreeSpace(d, x->disk);
         if(cmp == 0)
         {
-            // Key already exists and duplicates not allowed
             free(z);
             return false;
         }
@@ -342,7 +309,7 @@ static void tree_delete(AVL_tree *tree, BST_Node *z)
             transplant(tree, z, z->left);
         else
         {
-            BST_Node *y = avl_successor_node(z);
+            BST_Node *y = avl_successor_node(tree, z);
             if(y->parent != z)
             {
                 transplant(tree, y, y->right);
@@ -362,14 +329,12 @@ bool avl_delete_with_free(AVL_tree *tree, Disk *d)
     if(z == NULL)
         return false;
 
-    // Save parent node to start rebalancing from
     BST_Node *parent = z->parent;
 
     tree_delete(tree, z);
     diskFree(z->disk);
     free(z);
 
-    // Rebalance the tree from the parent node upward
     BST_Node *n = parent;
     while(n != NULL)
     {
@@ -407,13 +372,11 @@ bool avl_delete_without_free(AVL_tree *tree, Disk *d)
     if(z == NULL)
         return false;
 
-    // Save parent node to start rebalancing from
     BST_Node *parent = z->parent;
 
     tree_delete(tree, z);
     free(z);
 
-    // Rebalance the tree from the parent node upward
     BST_Node *n = parent;
     while(n != NULL)
     {
@@ -464,15 +427,15 @@ Disk *tree_search_bf(AVL_tree *tree, size_t size)
     while (current != NULL)
     {
         int cmp = size - diskFreeSpace(current->disk);
+        if(cmp == 0)
+            return current->disk;
+
         if (cmp < 0)
         {
-            // Current node's key is larger than our key,
-            // so it's a potential successor
             successor = current;
             current = current->left;
         }
         else
-            // Either equal or smaller, go right
             current = current->right;
     }
 

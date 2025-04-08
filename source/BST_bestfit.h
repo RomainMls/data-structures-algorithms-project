@@ -22,8 +22,6 @@ bool avl_delete_without_free(AVL_tree *tree, Disk *d);
 
 Disk *avl_find(AVL_tree *tree, Disk *d);
 
-Disk *avl_successor(AVL_tree *tree, Disk *d);
-
 Disk *tree_search_bf(AVL_tree *tree, size_t size);
 
 #endif // BST_BESTFIT_H_DEFINED

@@ -56,7 +56,11 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
             llInsertLast(disks, diskToStoreIn);
         }
         avl_delete_without_free(avl, diskToStoreIn);
-        diskAddFile(diskToStoreIn, currentFile);
+        if(!diskAddFile(diskToStoreIn, currentFile))
+        {
+            printf("BP_bestfit: can't add file to disk\n");
+            exit(1);
+        }
         avl_insert(avl, diskToStoreIn);
 
         currentNode = llNext(currentNode);

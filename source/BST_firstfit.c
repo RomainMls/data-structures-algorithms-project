@@ -28,35 +28,11 @@ typedef struct BST_Node
 }
 BST_Node;
 
-static void print_node(BST_Node *node)
-{
-    printf("Node of priority: %d, selfFreeSpace: %zu, subMax: %zu, BF: %d\n", node->priority, diskFreeSpace(node->disk), node->subMax, node->bf);
-}
-
-static void print_node_r(BST_Node *node)
-{
-    print_node(node);
-    if(node->left != NULL)
-    {
-        printf("The follwing is its left\n");
-        print_node_r(node->left);
-    }
-
-    if(node->right != NULL)
-        print_node_r(node->right);
-}
-
 struct AVL_tree_t
 {
     BST_Node *root;
     int counter;
 };
-
-void avl_print(AVL_tree *tree)
-{
-    if(tree->root != NULL)
-        print_node_r(tree->root);
-}
 
 AVL_tree *avl_create(void)
 {
@@ -211,7 +187,6 @@ static BST_Node *left_rotate(AVL_tree *tree, BST_Node *x)
 
     BST_Node *y = x->right;
 
-    // Update parent pointers
     y->parent = x->parent;
     if(x->parent == NULL)
         tree->root = y;
@@ -223,7 +198,6 @@ static BST_Node *left_rotate(AVL_tree *tree, BST_Node *x)
             x->parent->right = y;
     }
 
-    // Perform rotation
     x->right = y->left;
     if(y->left != NULL)
         y->left->parent = x;
@@ -231,7 +205,6 @@ static BST_Node *left_rotate(AVL_tree *tree, BST_Node *x)
     y->left = x;
     x->parent = y;
 
-    // Update balance factors
     x->bf = calculate_balance_factor(x);
     y->bf = calculate_balance_factor(y);
 
@@ -245,7 +218,6 @@ static BST_Node *right_rotate(AVL_tree *tree, BST_Node *x)
 
     BST_Node *y = x->left;
 
-    // Update parent pointers
     y->parent = x->parent;
     if(x->parent == NULL)
         tree->root = y;
@@ -257,7 +229,6 @@ static BST_Node *right_rotate(AVL_tree *tree, BST_Node *x)
             x->parent->right = y;
     }
 
-    // Perform rotation
     x->left = y->right;
     if(y->right != NULL)
         y->right->parent = x;
@@ -265,7 +236,6 @@ static BST_Node *right_rotate(AVL_tree *tree, BST_Node *x)
     y->right = x;
     x->parent = y;
 
-    // Update balance factors
     x->bf = calculate_balance_factor(x);
     y->bf = calculate_balance_factor(y);
 
@@ -298,7 +268,6 @@ bool avl_insert(AVL_tree *tree, Disk *disk)
     else
         y->right = z;
 
-    // now we need to rebalance from the z to the root
     BST_Node *n = z->parent;
     while(n != NULL)
     {
@@ -361,7 +330,7 @@ Disk *tree_search_ff(AVL_tree *tree, size_t size)
     return tree_search_ff_node(tree->root, size);
 }
 
-int avl_restore_sub_max(AVL_tree *tree)
+void avl_restore_sub_max(AVL_tree *tree)
 {
-    return restore_sub_max(tree, tree->root);
+    restore_sub_max(tree, tree->root);
 }
