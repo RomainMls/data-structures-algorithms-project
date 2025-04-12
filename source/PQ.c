@@ -48,7 +48,7 @@ bool pqInsert(PQ* pq, void *key)
         pq->array[i/2] = pq->array[i];
         pq->array[i] = temp;
 
-        i = i/2;
+        i /= 2;
     }
 
     return true;
