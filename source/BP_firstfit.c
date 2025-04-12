@@ -27,10 +27,10 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
     if(avl == NULL)
         return (size_t)(0);
 
-    size_t counter = 0;
+    size_t nbDisks = 0;
+
     Node *currentNode = llHead(files);
     File *currentFile;
-    Disk *diskToStoreIn;
 
     while(currentNode != NULL)
     {
@@ -44,7 +44,7 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
             return (size_t)(0);
         }
 
-        diskToStoreIn = tree_search_ff(avl, size);
+        Disk *diskToStoreIn = tree_search_ff(avl, size);
         if(diskToStoreIn == NULL)
         {
             diskToStoreIn = diskCreate(diskSize);
@@ -53,9 +53,9 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
                 printf("BP_firstfit: allocation error.\n");
                 exit(1);
             }
-            avl_insert(avl, diskToStoreIn);
-            counter++;
+            nbDisks++;
             llInsertLast(disks, diskToStoreIn);
+            avl_insert(avl, diskToStoreIn);
         }
         if(!diskAddFile(diskToStoreIn, currentFile))
         {
@@ -74,7 +74,7 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
     }
 
     avl_free_without_freeDisk(avl);
-    return counter;
+    return nbDisks;
 }
 
 

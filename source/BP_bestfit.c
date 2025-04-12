@@ -24,10 +24,10 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
     if(avl == NULL)
         return (size_t)(0);
 
+    size_t nbDisks = 0;
+
     Node *currentNode = llHead(files);
     File *currentFile;
-    Disk *diskToStoreIn;
-    size_t counter = 0;
 
     while(currentNode != NULL)
     {
@@ -41,7 +41,7 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
             return (size_t)(0);
         }
 
-        diskToStoreIn = tree_search_bf(avl, fileSize(currentFile));
+        Disk *diskToStoreIn = tree_search_bf(avl, fileSize(currentFile));
         if(diskToStoreIn == NULL)
         {
             // No disk can store the file, therefore add a new disk
@@ -51,8 +51,7 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
                 printf("BP_bestfit: allocation error.\n");
                 exit(1);
             }
-            counter++;
-            avl_insert(avl, diskToStoreIn);
+            nbDisks++;
             llInsertLast(disks, diskToStoreIn);
         }
         avl_delete_without_free(avl, diskToStoreIn);
@@ -73,5 +72,5 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
     }
 
     avl_free_without_freeDisk(avl);
-    return counter;
+    return nbDisks;
 }
