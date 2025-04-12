@@ -56,7 +56,10 @@ bool pqInsert(PQ* pq, void *key)
 
 void *pqGetMax(const PQ* pq)
 {
-    return pq->array[0];
+    if(pq->size > 0)
+        return pq->array[0];
+
+    return NULL;
 }
 
 void *pqExtractMax(PQ* pq)

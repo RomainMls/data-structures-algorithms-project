@@ -22,11 +22,7 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
         return 0;
 
     PQ *pq = pqCreate(llLength(files), compareDiskFreeSpace);
-    Disk *d = diskCreate(diskSize);
-
-    pqInsert(pq, d);
-
-    size_t nbDisks = 1;
+    size_t nbDisks = 0;
 
     Node *p = llHead(files);
     while(p != NULL){
@@ -56,7 +52,6 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
         p = llNext(p);
     }
 
-    llInsertLast(disks, d);
     pqFree(pq);
     return nbDisks;
 }
