@@ -1,0 +1,38 @@
+import re
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+# Load file
+with open("stats.txt", "r") as f:
+    lines = f.readlines()
+
+# Initialize containers
+data = {
+    "bpnextfit": {"x": [], "lost": []},
+    "bpworstfit": {"x": [], "lost": []},
+    "bpfirstfit": {"x": [], "lost": []}
+}
+
+current_algo = ""
+for line in lines:
+    line = line.strip()
+    if line.startswith("./") or line.startswith("bp"):
+        current_algo = line.split()[0].replace("./", "")
+        if current_algo in data:
+            data[current_algo]["x"].append(int(line.split()[1]))
+    elif "avg lost" in line and current_algo in data:
+        lost = int(re.search(r"avg lost = (\d+)", line).group(1))
+        data[current_algo]["lost"].append(lost)
+
+# Function to compute slope
+def compute_slope(x, y):
+    x = np.array(x).reshape(-1, 1)
+    y = np.array(y)
+    model = LinearRegression().fit(x, y)
+    return model.coef_[0], model.intercept_
+
+# Calculate and print results
+for key in ["bpnextfit", "bpworstfit", "bpfirstfit"]:
+    slope, intercept = compute_slope(data[key]["x"], data[key]["lost"])
+    name = key.replace("bp", "").capitalize().replace("fit", " Fit")
+    print(f"{name} slope: {slope:.2f}, intercept: {intercept:.2f}")
