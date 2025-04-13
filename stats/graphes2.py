@@ -42,7 +42,7 @@ plt.ylabel("Temps (secondes)")
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("time_comparaison.png")
+plt.savefig("time_comparaison.pdf")
 
 # Plot avg lost
 plt.figure(figsize=(12, 6))
@@ -54,7 +54,7 @@ plt.ylabel("Gaspillage")
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("lost_comparaison.png")
+plt.savefig("lost_comparaison.pdf")
 
 # Plot avg lost for only Best Fit and First Fit
 plt.figure(figsize=(12, 6))
@@ -66,4 +66,4 @@ plt.ylabel("Gaspillage")
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("lost_comparaison_bestfit_firstfit.png")
+plt.savefig("lost_comparaison_bestfit_firstfit.pdf")
