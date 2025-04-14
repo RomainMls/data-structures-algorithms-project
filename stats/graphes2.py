@@ -36,7 +36,7 @@ for line in lines:
 plt.figure(figsize=(12, 6))
 for algo, values in data.items():
     plt.plot(values["x"], values["time"], label=algo)
-plt.title("Comparaison du temps d'excécution")
+plt.title("Comparaison du temps de calcul")
 plt.xlabel("Nombre de fichiers")
 plt.ylabel("Temps (secondes)")
 plt.legend()
@@ -50,7 +50,7 @@ for algo, values in data.items():
     plt.plot(values["x"], values["lost"], label=algo)
 plt.title("Comparaison du gaspillage")
 plt.xlabel("Nombre de fichiers")
-plt.ylabel("Gaspillage")
+plt.ylabel("Unités de gaspillage")
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
@@ -60,10 +60,23 @@ plt.savefig("lost_comparaison.pdf")
 plt.figure(figsize=(12, 6))
 for algo in ["Best Fit", "First Fit"]:
     plt.plot(data[algo]["x"], data[algo]["lost"], label=algo)
-plt.title("Comparaison du gaspillage pour Best Fit et First Fit")
+plt.title("Comparaison du gaspillage")
 plt.xlabel("Nombre de fichiers")
-plt.ylabel("Gaspillage")
+plt.ylabel("Unités de gaspillage")
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
 plt.savefig("lost_comparaison_bestfit_firstfit.pdf")
+
+# Plot avg time for only Next Fit and Worst Fit
+plt.figure(figsize=(12, 6))
+for algo in ["Next Fit", "Worst Fit"]:
+    plt.plot(data[algo]["x"], data[algo]["time"], label=algo)
+plt.title("Comparaison du temps de calcul")
+plt.xlabel("Nombre de fichiers")
+plt.ylabel("Temps (secondes)")
+plt.legend()
+plt.grid(True)
+plt.tight_layout()
+plt.savefig("time_comparaison_nextfit_worstfit.pdf")
+
