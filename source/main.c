@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
     double avgTime = totalTime / nbTests;
     long avgLost = totalLost / nbTests;
 
-    printf("avg time: %f\navg lost = %ld\n", avgTime, avgLost);
+    printf("avg time = %f\navg lost = %ld\n", avgTime, avgLost);
 
     return 0;
 }
