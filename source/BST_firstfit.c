@@ -4,8 +4,6 @@
 
 #include "BST_firstfit.h"
 
-#define ALLOW_DUPLICATES false
-
 typedef enum
 {
     LEFTIMBALANCE = -2,
@@ -16,21 +14,28 @@ typedef enum
 }
 Balance_Factor;
 
-typedef struct BST_Node
+struct AVL_Node_t
 {
     int priority;
     Disk *disk;
     size_t subMax;
-    struct BST_Node *parent;
-    struct BST_Node *left;
-    struct BST_Node *right;
+    AVL_Node *parent;
+    AVL_Node *left;
+    AVL_Node *right;
     Balance_Factor bf;
+};
+
+Disk *getDisk(AVL_Node *n)
+{
+    if(n != NULL)
+        return n->disk;
+
+    return NULL;
 }
-BST_Node;
 
 struct AVL_tree_t
 {
-    BST_Node *root;
+    AVL_Node *root;
     int counter;
 };
 
@@ -46,7 +51,7 @@ AVL_tree *avl_create(void)
     return tree;
 }
 
-static void free_subtree_with_freeDisk(AVL_tree *tree, BST_Node *root)
+static void free_subtree_with_freeDisk(AVL_tree *tree, AVL_Node *root)
 {
     if(root == NULL)
         return;
@@ -58,7 +63,7 @@ static void free_subtree_with_freeDisk(AVL_tree *tree, BST_Node *root)
     free(root);
 }
 
-static void free_subtree_without_freeDisk(AVL_tree *tree, BST_Node *root)
+static void free_subtree_without_freeDisk(AVL_tree *tree, AVL_Node *root)
 {
     if(root == NULL)
         return;
@@ -89,7 +94,7 @@ static int max(int a, int b)
     return b;
 }
 
-static int subtree_height(BST_Node *root)
+static int subtree_height(AVL_Node *root)
 {
     if(root == NULL)
         return 0;
@@ -102,7 +107,7 @@ int avl_height(AVL_tree *tree)
     return subtree_height(tree->root);
 }
 
-static int calculate_balance_factor(BST_Node *x)
+static int calculate_balance_factor(AVL_Node *x)
 {
     if(x == NULL)
         return BALANCED;
@@ -110,7 +115,7 @@ static int calculate_balance_factor(BST_Node *x)
     return subtree_height(x->right) - subtree_height(x->left);
 }
 
-static size_t restore_sub_max(AVL_tree *tree, BST_Node *n)
+static size_t restore_subMax(AVL_tree *tree, AVL_Node *n)
 {
     if(n == NULL)
         return 0;
@@ -121,8 +126,8 @@ static size_t restore_sub_max(AVL_tree *tree, BST_Node *n)
         return n->subMax;
     }
 
-    size_t leftMax = restore_sub_max(tree, n->left);
-    size_t rightMax = restore_sub_max(tree, n->right);
+    size_t leftMax = restore_subMax(tree, n->left);
+    size_t rightMax = restore_subMax(tree, n->right);
 
     if(n->left == NULL && n->right != NULL)
     {
@@ -178,14 +183,16 @@ static size_t restore_sub_max(AVL_tree *tree, BST_Node *n)
             return rightMax;
         }
     }
+
+    return n->subMax;
 }
 
-static BST_Node *left_rotate(AVL_tree *tree, BST_Node *x)
+static AVL_Node *left_rotate(AVL_tree *tree, AVL_Node *x)
 {
     if(x == NULL || x->right == NULL)
         return x;
 
-    BST_Node *y = x->right;
+    AVL_Node *y = x->right;
 
     y->parent = x->parent;
     if(x->parent == NULL)
@@ -211,12 +218,12 @@ static BST_Node *left_rotate(AVL_tree *tree, BST_Node *x)
     return y;
 }
 
-static BST_Node *right_rotate(AVL_tree *tree, BST_Node *x)
+static AVL_Node *right_rotate(AVL_tree *tree, AVL_Node *x)
 {
     if(x == NULL || x->left == NULL)
         return x;
 
-    BST_Node *y = x->left;
+    AVL_Node *y = x->left;
 
     y->parent = x->parent;
     if(x->parent == NULL)
@@ -244,9 +251,9 @@ static BST_Node *right_rotate(AVL_tree *tree, BST_Node *x)
 
 bool avl_insert(AVL_tree *tree, Disk *disk)
 {
-    BST_Node *y = NULL;
-    BST_Node *x = tree->root;
-    BST_Node *z = malloc(sizeof(BST_Node));
+    AVL_Node *y = NULL;
+    AVL_Node *x = tree->root;
+    AVL_Node *z = malloc(sizeof(AVL_Node));
     if(z == NULL)
         return false;
 
@@ -268,7 +275,7 @@ bool avl_insert(AVL_tree *tree, Disk *disk)
     else
         y->right = z;
 
-    BST_Node *n = z->parent;
+    AVL_Node *n = z->parent;
     while(n != NULL)
     {
         Balance_Factor bf = calculate_balance_factor(n);
@@ -278,35 +285,35 @@ bool avl_insert(AVL_tree *tree, Disk *disk)
             if(calculate_balance_factor(n->right) >= BALANCED)
             {
                 n = left_rotate(tree, n);
-                restore_sub_max(tree, n->parent);
+                restore_subMax(tree, n->parent);
             }
             else
             {
                 n->right = right_rotate(tree, n->right);
                 n = left_rotate(tree, n);
-                restore_sub_max(tree, n->parent);
+                restore_subMax(tree, n->parent);
             }
         }
         else if(bf == LEFTIMBALANCE)
         {
             if(calculate_balance_factor(n->left) <= BALANCED)
             {   n = right_rotate(tree, n);
-                restore_sub_max(tree, n->parent);
+                restore_subMax(tree, n->parent);
             }
             else
             {
                 n->left = left_rotate(tree, n->left);
                 n = right_rotate(tree, n);
-                restore_sub_max(tree, n->parent);
+                restore_subMax(tree, n->parent);
             }
         }
         n = n->parent;
     }
-    restore_sub_max(tree, z);
+    restore_subMax(tree, z);
     return true;
 }
 
-static Disk *tree_search_ff_node(BST_Node *root, size_t size)
+static AVL_Node *tree_search_ff_node(AVL_Node *root, size_t size)
 {
     if(root == NULL)
         return NULL;
@@ -314,25 +321,56 @@ static Disk *tree_search_ff_node(BST_Node *root, size_t size)
     if(root->subMax < size)
         return NULL;
 
-    BST_Node *currentBest = root;
+    AVL_Node *currentBest = root;
 
     while(currentBest->left != NULL && currentBest->left->subMax >= size)
         currentBest = currentBest->left;
 
     if(diskFreeSpace(currentBest->disk) >= size)
-        return currentBest->disk;
+        return currentBest;
     else
         return tree_search_ff_node(currentBest->right, size);
 }
 
-Disk *tree_search_ff(AVL_tree *tree, size_t size)
+AVL_Node *tree_search_ff(AVL_tree *tree, size_t size)
 {
     return tree_search_ff_node(tree->root, size);
 }
 
-void avl_restore_sub_max(AVL_tree *tree)
+void avl_notify_update(AVL_tree *tree, AVL_Node *modified_node, size_t prev_size)
 {
-    restore_sub_max(tree, tree->root);
+    /*  Nodes to be updates:
+        (Their subMax can only decrease since the disk size has decreased)
+        The node that contains the disk given as argument
+        and all of its parents to the root
+    */
+    if(modified_node == NULL)
+        return;
+
+    if(modified_node->subMax == prev_size)
+        restore_subMax(tree, modified_node);
+
+    else
+        // modification has no impact on the subMax structure
+        return;
+
+    AVL_Node *current = modified_node->parent;
+
+    while(current != NULL)
+    {
+        if(current->subMax == prev_size)
+        {
+            // that means that the submax was probably due to the modified file
+            // we should update it
+            restore_subMax(tree, current);
+        }
+        else
+            // if the previous size wasn't the submax for current
+            // it isn't for its parent
+            break;
+
+        current = current->parent;
+    }
 }
 
 bool detect_imbalance(AVL_tree *tree)

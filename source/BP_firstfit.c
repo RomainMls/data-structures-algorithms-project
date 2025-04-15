@@ -44,8 +44,20 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
             return (size_t)(0);
         }
 
-        Disk *diskToStoreIn = tree_search_ff(avl, size);
-        if(diskToStoreIn == NULL)
+        AVL_Node *resultNode = tree_search_ff(avl, size);
+        Disk *diskToStoreIn;
+        if(resultNode != NULL)
+        {
+            diskToStoreIn = getDisk(resultNode);
+            size_t prev_size = diskFreeSpace(diskToStoreIn);
+            if(!diskAddFile(diskToStoreIn, currentFile))
+            {
+                printf("BP_bestfit: can't add file to disk\n");
+                exit(1);
+            }
+            avl_notify_update(avl, resultNode, prev_size);
+        }
+        else
         {
             diskToStoreIn = diskCreate(diskSize);
             if(diskToStoreIn == NULL)
@@ -55,14 +67,13 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
             }
             nbDisks++;
             llInsertLast(disks, diskToStoreIn);
+            if(!diskAddFile(diskToStoreIn, currentFile))
+            {
+                printf("BP_bestfit: can't add file to disk\n");
+                exit(1);
+            }
             avl_insert(avl, diskToStoreIn);
         }
-        if(!diskAddFile(diskToStoreIn, currentFile))
-        {
-            printf("BP_bestfit: can't add file to disk\n");
-            exit(1);
-        }
-        avl_restore_sub_max(avl);
 
         currentNode = llNext(currentNode);
 
