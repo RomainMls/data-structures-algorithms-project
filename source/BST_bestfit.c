@@ -108,14 +108,6 @@ static AVL_Node *avl_successor_node(AVL_tree *tree, AVL_Node *node)
     }
 }
 
-static int recalculate_balance_factor(AVL_Node *x)
-{
-    if(x == NULL)
-        return BALANCED;
-
-    return subtree_height(x->right) - subtree_height(x->left);
-}
-
 static AVL_Node *rotate_left(AVL_tree *tree, AVL_Node *x)
 {
     if(x == NULL || x->right == NULL)
@@ -259,6 +251,7 @@ static void delete_node(AVL_tree *tree, AVL_Node *z)
 void avl_delete(AVL_tree *tree, AVL_Node *n)
 {
     delete_node(tree, n);
+    // except we have to rebalance the three
 }
 
 AVL_Node *tree_search_bf(AVL_tree *tree, size_t size)
@@ -287,6 +280,14 @@ AVL_Node *tree_search_bf(AVL_tree *tree, size_t size)
         return NULL;
 
     return successor;
+}
+
+static int recalculate_balance_factor(AVL_Node *x)
+{
+    if(x == NULL)
+        return BALANCED;
+
+    return subtree_height(x->right) - subtree_height(x->left);
 }
 
 bool detect_imbalance(AVL_tree *tree)
