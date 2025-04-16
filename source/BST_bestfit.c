@@ -13,19 +13,28 @@ typedef enum
 }
 Balance_Factor;
 
-typedef struct BST_Node
+struct AVL_Node_t
 {
+    int priority;
     Disk *disk;
-    struct BST_Node *parent;
-    struct BST_Node *left;
-    struct BST_Node *right;
+    size_t subMax;
+    AVL_Node *parent;
+    AVL_Node *left;
+    AVL_Node *right;
     Balance_Factor bf;
+};
+
+Disk *getDisk(AVL_Node *n)
+{
+    if(n != NULL)
+        return n->disk;
+
+    return NULL;
 }
-BST_Node;
 
 struct AVL_tree_t
 {
-    BST_Node *root;
+    AVL_Node *root;
 };
 
 AVL_tree *avl_create(void)
@@ -39,38 +48,20 @@ AVL_tree *avl_create(void)
     return tree;
 }
 
-static void free_subtree_with_freeDisk(AVL_tree *tree, BST_Node *root)
+static void free_subtree(AVL_tree *tree, AVL_Node *root)
 {
     if(root == NULL)
         return;
 
-    free_subtree_with_freeDisk(tree, root->left);
-    free_subtree_with_freeDisk(tree, root->right);
-
-    diskFree(root->disk);
-    free(root);
-}
-
-static void free_subtree_without_freeDisk(AVL_tree *tree, BST_Node *root)
-{
-    if(root == NULL)
-        return;
-
-    free_subtree_without_freeDisk(tree, root->left);
-    free_subtree_without_freeDisk(tree, root->right);
+    free_subtree(tree, root->left);
+    free_subtree(tree, root->right);
 
     free(root);
 }
 
-void avl_free_with_freeDisk(AVL_tree *tree)
+void avl_free(AVL_tree *tree)
 {
-    free_subtree_with_freeDisk(tree, tree->root);
-    free(tree);
-}
-
-void avl_free_without_freeDisk(AVL_tree *tree)
-{
-    free_subtree_without_freeDisk(tree, tree->root);
+    free_subtree(tree, tree->root);
     free(tree);
 }
 
@@ -82,7 +73,7 @@ static int max(int a, int b)
     return b;
 }
 
-static int subtree_height(BST_Node *root)
+static int subtree_height(AVL_Node *root)
 {
     if(root == NULL)
         return 0;
@@ -90,33 +81,9 @@ static int subtree_height(BST_Node *root)
     return 1 + max(subtree_height(root->left), subtree_height(root->right));
 }
 
-int avl_height(AVL_tree *tree)
+static AVL_Node *avl_successor_node(AVL_tree *tree, AVL_Node *node)
 {
-    return subtree_height(tree->root);
-}
-
-static BST_Node *find_node(AVL_tree *tree, Disk *d)
-{
-    BST_Node *ptr = tree->root;
-
-    while(ptr != NULL)
-    {
-        int cmp = compareDiskFreeSpace(d, ptr->disk);
-        if(cmp == 0)
-            return ptr;
-
-        if(cmp > 0)
-            ptr = ptr->right;
-        else
-            ptr = ptr->left;
-    }
-
-    return NULL;
-}
-
-static BST_Node *avl_successor_node(AVL_tree *tree, BST_Node *node)
-{
-    BST_Node *ptr = node->right;
+    AVL_Node *ptr = node->right;
 
     if(ptr != NULL) {
         while(ptr->left != NULL)
@@ -126,7 +93,7 @@ static BST_Node *avl_successor_node(AVL_tree *tree, BST_Node *node)
     else
     {
         ptr = node->parent;
-        BST_Node *current = node;
+        AVL_Node *current = node;
 
         while(ptr != NULL && current == ptr->right)
         {
@@ -141,7 +108,7 @@ static BST_Node *avl_successor_node(AVL_tree *tree, BST_Node *node)
     }
 }
 
-static int calculate_balance_factor(BST_Node *x)
+static int recalculate_balance_factor(AVL_Node *x)
 {
     if(x == NULL)
         return BALANCED;
@@ -149,12 +116,12 @@ static int calculate_balance_factor(BST_Node *x)
     return subtree_height(x->right) - subtree_height(x->left);
 }
 
-static BST_Node *left_rotate(AVL_tree *tree, BST_Node *x)
+static AVL_Node *rotate_left(AVL_tree *tree, AVL_Node *x)
 {
     if(x == NULL || x->right == NULL)
         return x;
 
-    BST_Node *y = x->right;
+    AVL_Node *y = x->right;
 
     y->parent = x->parent;
     if(x->parent == NULL)
@@ -174,18 +141,15 @@ static BST_Node *left_rotate(AVL_tree *tree, BST_Node *x)
     y->left = x;
     x->parent = y;
 
-    x->bf = calculate_balance_factor(x);
-    y->bf = calculate_balance_factor(y);
-
     return y;
 }
 
-static BST_Node *right_rotate(AVL_tree *tree, BST_Node *x)
+static AVL_Node *rotate_right(AVL_tree *tree, AVL_Node *x)
 {
     if(x == NULL || x->left == NULL)
         return x;
 
-    BST_Node *y = x->left;
+    AVL_Node *y = x->left;
 
     y->parent = x->parent;
     if(x->parent == NULL)
@@ -205,35 +169,27 @@ static BST_Node *right_rotate(AVL_tree *tree, BST_Node *x)
     y->right = x;
     x->parent = y;
 
-    x->bf = calculate_balance_factor(x);
-    y->bf = calculate_balance_factor(y);
-
     return y;
 }
 
-bool avl_insert(AVL_tree *tree, Disk *d)
+AVL_Node *avl_insert(AVL_tree *tree, Disk *d)
 {
-    BST_Node *y = NULL;
-    BST_Node *x = tree->root;
-    BST_Node *z = malloc(sizeof(BST_Node));
+    AVL_Node *y = NULL;
+    AVL_Node *x = tree->root;
+    AVL_Node *z = malloc(sizeof(AVL_Node));
     if(z == NULL)
-        return false;
+        return NULL;
 
     z->disk = d;
     z->left = NULL;
     z->right = NULL;
-    z->bf = BALANCED;
+    z->bf = BALANCED;       // because the node will end up at the bottom of the tree
 
     while(x != NULL)
     {
         y = x;
 
         int cmp = compareDiskFreeSpace(d, x->disk);
-        if(cmp == 0)
-        {
-            free(z);
-            return false;
-        }
 
         if(cmp < 0)
             x = x->left;
@@ -243,7 +199,10 @@ bool avl_insert(AVL_tree *tree, Disk *d)
 
     z->parent = y;
     if(y == NULL)
+    {
         tree->root = z;
+        return z;
+    }
     else
     {
         if(compareDiskFreeSpace(d, y->disk) < 0)
@@ -252,39 +211,11 @@ bool avl_insert(AVL_tree *tree, Disk *d)
             y->right = z;
     }
 
-    // now we need to rebalance from the z to the root
-    BST_Node *n = z->parent;
-    while(n != NULL)
-    {
-        Balance_Factor bf = calculate_balance_factor(n);
-
-        if(bf == RIGHTIMBALANCE)
-        {
-            if(calculate_balance_factor(n->right) >= BALANCED)
-                n = left_rotate(tree, n);
-            else
-            {
-                n->right = right_rotate(tree, n->right);
-                n = left_rotate(tree, n);
-            }
-        }
-        else if(bf == LEFTIMBALANCE)
-        {
-            if(calculate_balance_factor(n->left) <= BALANCED)
-                n = right_rotate(tree, n);
-            else
-            {
-                n->left = left_rotate(tree, n->left);
-                n = right_rotate(tree, n);
-            }
-        }
-        n = n->parent;
-    }
-
-    return true;
+    // node successfully added, but we need to rebalance the tree
+    return z;
 }
 
-static void transplant(AVL_tree *tree, BST_Node *a, BST_Node *b)
+static void transplant(AVL_tree *tree, AVL_Node *a, AVL_Node *b)
 {
     if(a->parent == NULL)
         tree->root = b;
@@ -299,7 +230,7 @@ static void transplant(AVL_tree *tree, BST_Node *a, BST_Node *b)
         b->parent = a->parent;
 }
 
-static void tree_delete(AVL_tree *tree, BST_Node *z)
+static void delete_node(AVL_tree *tree, AVL_Node *z)
 {
     if(z->left == NULL)
         transplant(tree, z, z->right);
@@ -309,7 +240,7 @@ static void tree_delete(AVL_tree *tree, BST_Node *z)
             transplant(tree, z, z->left);
         else
         {
-            BST_Node *y = avl_successor_node(tree, z);
+            AVL_Node *y = avl_successor_node(tree, z);
             if(y->parent != z)
             {
                 transplant(tree, y, y->right);
@@ -321,114 +252,27 @@ static void tree_delete(AVL_tree *tree, BST_Node *z)
             y->left->parent = y;
         }
     }
-}
 
-bool avl_delete_with_free(AVL_tree *tree, Disk *d)
-{
-    BST_Node *z = find_node(tree, d);
-    if(z == NULL)
-        return false;
-
-    BST_Node *parent = z->parent;
-
-    tree_delete(tree, z);
-    diskFree(z->disk);
     free(z);
-
-    BST_Node *n = parent;
-    while(n != NULL)
-    {
-        Balance_Factor bf = calculate_balance_factor(n);
-
-        if(bf == RIGHTIMBALANCE)
-        {
-            if(calculate_balance_factor(n->right) >= BALANCED)
-                n = left_rotate(tree, n);
-            else
-            {
-                n->right = right_rotate(tree, n->right);
-                n = left_rotate(tree, n);
-            }
-        }
-        else if(bf == LEFTIMBALANCE)
-        {
-            if(calculate_balance_factor(n->left) <= BALANCED)
-                n = right_rotate(tree, n);
-            else
-            {
-                n->left = left_rotate(tree, n->left);
-                n = right_rotate(tree, n);
-            }
-        }
-        n = n->parent;
-    }
-
-    return true;
 }
 
-bool avl_delete_without_free(AVL_tree *tree, Disk *d)
+void avl_delete(AVL_tree *tree, AVL_Node *n)
 {
-    BST_Node *z = find_node(tree, d);
-    if(z == NULL)
-        return false;
-
-    BST_Node *parent = z->parent;
-
-    tree_delete(tree, z);
-    free(z);
-
-    BST_Node *n = parent;
-    while(n != NULL)
-    {
-        Balance_Factor bf = calculate_balance_factor(n);
-
-        if(bf == RIGHTIMBALANCE)
-        {
-            if(calculate_balance_factor(n->right) >= BALANCED)
-                n = left_rotate(tree, n);
-            else
-            {
-                n->right = right_rotate(tree, n->right);
-                n = left_rotate(tree, n);
-            }
-        }
-        else if(bf == LEFTIMBALANCE)
-        {
-            if(calculate_balance_factor(n->left) <= BALANCED)
-                n = right_rotate(tree, n);
-            else
-            {
-                n->left = left_rotate(tree, n->left);
-                n = right_rotate(tree, n);
-            }
-        }
-        n = n->parent;
-    }
-
-    return true;
+    delete_node(tree, n);
 }
 
-Disk *avl_find(AVL_tree *tree, Disk *d)
-{
-    BST_Node *node = find_node(tree, d);
-    if(node == NULL)
-        return NULL;
-
-    return node->disk;
-}
-
-Disk *tree_search_bf(AVL_tree *tree, size_t size)
+AVL_Node *tree_search_bf(AVL_tree *tree, size_t size)
 {
     if (tree == NULL)
         return NULL;
 
-    BST_Node *current = tree->root;
-    BST_Node *successor = NULL;
+    AVL_Node *current = tree->root;
+    AVL_Node *successor = NULL;
     while (current != NULL)
     {
         int cmp = size - diskFreeSpace(current->disk);
         if(cmp == 0)
-            return current->disk;
+            return current;
 
         if (cmp < 0)
         {
@@ -442,12 +286,12 @@ Disk *tree_search_bf(AVL_tree *tree, size_t size)
     if(successor == NULL)
         return NULL;
 
-    return successor->disk;
+    return successor;
 }
 
 bool detect_imbalance(AVL_tree *tree)
 {
-    if(abs(calculate_balance_factor(tree->root)) > 1)
+    if(abs(recalculate_balance_factor(tree->root)) > 1)
         return true;
 
     return false;
