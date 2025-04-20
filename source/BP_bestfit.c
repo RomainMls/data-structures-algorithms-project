@@ -1,4 +1,3 @@
-
 #include <stddef.h>
 #include <stdlib.h>
 
@@ -20,37 +19,32 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
 {
     llSort(files, reverse_file_compare);        // sorted in decreasing
 
-    AVL_tree *avl = avl_create();
-    if(avl == NULL)
-        return (size_t)(0);
+    Treap_tree *treap = treap_create();
+    if(treap == NULL)
+        return 0;
 
     size_t nbDisks = 0;
-
     Node *currentNode = llHead(files);
+
     while(currentNode != NULL)
     {
         File *currentFile = llData(currentNode);
         size_t size = fileSize(currentFile);
+
         if(size > diskSize)
         {
             printf("File size larger than disks' sizes\n");
-            avl_free(avl);
+            treap_free(treap);
             while(llPopFirst(disks) != NULL);   // reset disks list to match the 0
-            return (size_t)(0);
+            return 0;
         }
 
-        Disk *diskToStoreIn;
-        AVL_Node *n = tree_search_bf(avl, size);
+        Disk *diskToStoreIn = NULL;
+        Treap_node *n = tree_search_bf(treap, size);
         if(n != NULL)
         {
             diskToStoreIn = getDisk(n);
-            //avl delete n
-            if(!diskAddFile(diskToStoreIn, currentFile))
-            {
-                printf("BP_bestfit: can't add file to disk\n");
-                exit(1);
-            }
-            avl_insert(avl, diskToStoreIn);
+            treap_delete(treap, n);
         }
         else
         {
@@ -58,21 +52,24 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
             if(diskToStoreIn == NULL)
             {
                 printf("BP_bestfit: allocation error.\n");
-                exit(1);
+                treap_free(treap);
+                return 0;
             }
+
             nbDisks++;
             llInsertLast(disks, diskToStoreIn);
-            avl_insert(avl, diskToStoreIn);
         }
-        currentNode = llNext(currentNode);
 
-        // if(detect_imbalance(avl))
-        // {
-        //     printf("BP_bestfit: imbalance detected\n");
-        //     exit(1);
-        // }
+        if (!diskAddFile(diskToStoreIn, currentFile))
+        {
+            printf("BP_bestfit: can't add file to disk.\n");
+            return 0;
+        }
+
+        treap_insert(treap, diskToStoreIn);
+        currentNode = llNext(currentNode);
     }
 
-    avl_free(avl);
+    treap_free(treap);
     return nbDisks;
 }

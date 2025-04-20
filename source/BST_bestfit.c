@@ -1,299 +1,210 @@
-#include <stdlib.h>
-#include <stdbool.h>
+/* treap.c
+   Copyright (C) 1993 by Matthew Clegg.  All rights reserved.
 
+   Implementation of treap data structure.
+*/
+
+#include <stdio.h>
 #include "BST_bestfit.h"
+#include "Disk.h"
 
-typedef enum
-{
-    LEFTIMBALANCE = -2,
-    LEFTHEAVY = -1,
-    BALANCED = 0,
-    RIGHTHEAVY = 1,
-    RIGHTIMBALANCE = 2
-}
-Balance_Factor;
-
-struct AVL_Node_t
-{
-    int priority;
+struct Treap_node_t {
     Disk *disk;
-    size_t subMax;
-    AVL_Node *parent;
-    AVL_Node *left;
-    AVL_Node *right;
-    Balance_Factor bf;
+    int priority;
+    struct Treap_node_t *parent;
+    struct Treap_node_t *left;
+    struct Treap_node_t *right;
 };
 
-Disk *getDisk(AVL_Node *n)
-{
-    if(n != NULL)
-        return n->disk;
+struct Treap_tree_t {
+    struct Treap_node_t *root;
+};
 
-    return NULL;
+static void sift_upwards (Treap_tree *t, Treap_node *q)
+/* On entry, t is an ordered tree, where the only node violating the
+   property is q.  Moreover, the subtree rooted at q is a treap.
+   Rotates q upwards until the treap property is restored for t.
+*/
+{
+  Treap_node *p, *n;
+
+  while ((q->parent != NULL) && (q->parent->priority < q->priority)) {
+    p = q->parent;
+    q->parent = p->parent;
+    p->parent = q;
+
+    if (q->parent != NULL) {
+      if (q->parent->left == p)
+	q->parent->left = q;
+      else
+	q->parent->right = q;
+    } else
+      t->root = q;
+
+    if (q == p->left) {  /* right rotation */
+      n = q->right;
+      q->right  = p;
+      p->left   = n;
+    } else { /* left rotation */
+      n = q->left;
+      q->left = p;
+      p->right = n;
+    }
+    if (n != NULL) n->parent = p;
+  }
 }
 
-struct AVL_tree_t
-{
-    AVL_Node *root;
-};
+#define mcmp(x,y) \
+  (((int) (x) < (int) (y))? -1: (((int) (x) == (int) (y))? 0: 1))
 
-AVL_tree *avl_create(void)
+void treap_insert
+  (Treap_tree *t, Disk *d)
+/* Inserts the pair (k,d) into the treap t. */
 {
-    AVL_tree *tree = malloc(sizeof(AVL_tree));
-    if(tree == NULL)
+  Treap_node *n = t->root;    /* The current node we are examining in
+				   our path down through the tree. */
+  Treap_node *q = NULL;  /* The new node which we are inserting
+				   into the tree. */
+
+  q = (Treap_node *) malloc (sizeof(Treap_node));
+  q->left = q->right = q->parent = NULL;
+  q->disk = d;
+  q->priority = rand();
+
+  /* If the treap is initially empty, then we treat this as a special
+     case: */
+  
+  if (t->root == NULL) {
+    t->root = q;
+    return;
+  }
+
+  /* Now we search down through the treap, looking for where to insert
+     our node: */
+  while (n != NULL) {
+    q->parent = n;
+    size_t s1 = diskFreeSpace(d);
+    size_t s2 = diskFreeSpace(n->disk);
+    
+    if (s1 < s2)
+        n = n->left;
+    else
+        n = n->right;
+  }
+
+  size_t s1 = diskFreeSpace(d);
+  size_t s2 = diskFreeSpace(q->parent->disk);
+  if (s2 > s1)
+    q->parent->left = q;
+  else
+    q->parent->right = q;
+
+  /* At this point, q has been inserted into the tree as a leaf,
+     and the ordering of the keys of the tree has been maintained.
+     We now need to move q upwards through the tree in order to
+     restore the heap order.
+     */
+
+  sift_upwards (t, q);
+}
+
+void treap_delete 
+  (Treap_tree *t, Treap_node *p)
+/* Searches the treap t for an element whose key matches *k.
+   If found, deletes the element, sets *k equal to the key pointer in
+   that that element, and returns the associated data.  If not found,
+   returns NULL.
+*/
+{
+  Treap_node *n, *q;    /* descendants of p. */
+
+  /* At this point, p points to our node.  We must push it down to a 
+     leaf, and then we can detach the leaf. */
+  while ((p->left != NULL) && (p->right != NULL)) {
+    if (p->left->priority > p->right->priority) { /* right rotation */
+      q = p->left;
+      n = q->right;
+      q->right = p;
+      p->left = n;
+    } else { /* left rotation */
+      q = p->right;
+      n = q->left;
+      q->left = p;
+      p->right = n;
+    }
+    if (p->parent != NULL) {
+      if (p->parent->left == p)
+	p->parent->left = q;
+      else
+	p->parent->right = q;
+    } else
+      t->root = q;
+    q->parent = p->parent;
+    p->parent = q;
+    if (n != NULL) n->parent = p;
+  }
+
+  /* At this point, either p's left child is NULL or p's right child
+     is NULL, so we can safely remove p from the tree. */
+  if (p->left == NULL)
+    q = p->right;
+  else
+    q = p->left;
+  if (q != NULL) q->parent = p->parent;
+
+  if (p->parent != NULL) {
+    if (p == p->parent->left)
+      p->parent->left = q;
+    else
+      p->parent->right = q;
+  } else
+    t->root = q;
+
+  free (p);
+}
+
+Treap_tree *treap_create(void){
+    Treap_tree *t = malloc(sizeof(Treap_tree));
+    if(t == NULL)
         return NULL;
-
-    tree->root = NULL;
-
-    return tree;
+    
+    t->root = NULL;
+    return t;
 }
 
-static void free_subtree(AVL_tree *tree, AVL_Node *root)
-{
-    if(root == NULL)
+static void treap_free_subtree(Treap_node *n){
+    if(n == NULL)
         return;
-
-    free_subtree(tree, root->left);
-    free_subtree(tree, root->right);
-
-    free(root);
+    treap_free_subtree(n->left);
+    treap_free_subtree(n->right);
+    free(n);
 }
 
-void avl_free(AVL_tree *tree)
-{
-    free_subtree(tree, tree->root);
-    free(tree);
+void treap_free(Treap_tree *t){
+    if(t == NULL)
+        return;
+    treap_free_subtree(t->root);
 }
 
-static int max(int a, int b)
-{
-    if(a > b)
-        return a;
-
-    return b;
-}
-
-static int subtree_height(AVL_Node *root)
-{
-    if(root == NULL)
-        return 0;
-
-    return 1 + max(subtree_height(root->left), subtree_height(root->right));
-}
-
-static AVL_Node *avl_successor_node(AVL_tree *tree, AVL_Node *node)
-{
-    AVL_Node *ptr = node->right;
-
-    if(ptr != NULL) {
-        while(ptr->left != NULL)
-            ptr = ptr->left;
-        return ptr;
-    }
-    else
-    {
-        ptr = node->parent;
-        AVL_Node *current = node;
-
-        while(ptr != NULL && current == ptr->right)
-        {
-            current = ptr;
-            ptr = ptr->parent;
-        }
-
-        if(ptr == tree->root)
-            return NULL;
-
-        return ptr;
-    }
-}
-
-static AVL_Node *rotate_left(AVL_tree *tree, AVL_Node *x)
-{
-    if(x == NULL || x->right == NULL)
-        return x;
-
-    AVL_Node *y = x->right;
-
-    y->parent = x->parent;
-    if(x->parent == NULL)
-        tree->root = y;
-    else
-    {
-        if(x == x->parent->left)
-            x->parent->left = y;
-        else
-            x->parent->right = y;
-    }
-
-    x->right = y->left;
-    if(y->left != NULL)
-        y->left->parent = x;
-
-    y->left = x;
-    x->parent = y;
-
-    return y;
-}
-
-static AVL_Node *rotate_right(AVL_tree *tree, AVL_Node *x)
-{
-    if(x == NULL || x->left == NULL)
-        return x;
-
-    AVL_Node *y = x->left;
-
-    y->parent = x->parent;
-    if(x->parent == NULL)
-        tree->root = y;
-    else
-    {
-        if(x == x->parent->left)
-            x->parent->left = y;
-        else
-            x->parent->right = y;
-    }
-
-    x->left = y->right;
-    if(y->right != NULL)
-        y->right->parent = x;
-
-    y->right = x;
-    x->parent = y;
-
-    return y;
-}
-
-AVL_Node *avl_insert(AVL_tree *tree, Disk *d)
-{
-    AVL_Node *y = NULL;
-    AVL_Node *x = tree->root;
-    AVL_Node *z = malloc(sizeof(AVL_Node));
-    if(z == NULL)
+Disk *getDisk(Treap_node *n){
+    if(n == NULL)
         return NULL;
-
-    z->disk = d;
-    z->left = NULL;
-    z->right = NULL;
-    z->bf = BALANCED;       // because the node will end up at the bottom of the tree
-
-    while(x != NULL)
-    {
-        y = x;
-
-        int cmp = compareDiskFreeSpace(d, x->disk);
-
-        if(cmp < 0)
-            x = x->left;
-        else
-            x = x->right;
-    }
-
-    z->parent = y;
-    if(y == NULL)
-    {
-        tree->root = z;
-        return z;
-    }
-    else
-    {
-        if(compareDiskFreeSpace(d, y->disk) < 0)
-            y->left = z;
-        else
-            y->right = z;
-    }
-
-    // node successfully added, but we need to rebalance the tree
-    return z;
+    return n->disk;
 }
 
-static void transplant(AVL_tree *tree, AVL_Node *a, AVL_Node *b)
-{
-    if(a->parent == NULL)
-        tree->root = b;
-    else
-    {
-        if(a == a->parent->left)
-            a->parent->left = b;
-        else
-            a->parent->right = b;
-    }
-    if(b != NULL)
-        b->parent = a->parent;
-}
-
-static void delete_node(AVL_tree *tree, AVL_Node *z)
-{
-    if(z->left == NULL)
-        transplant(tree, z, z->right);
-    else
-    {
-        if(z->right == NULL)
-            transplant(tree, z, z->left);
-        else
-        {
-            AVL_Node *y = avl_successor_node(tree, z);
-            if(y->parent != z)
-            {
-                transplant(tree, y, y->right);
-                y->right = z->right;
-                y->right->parent = y;
-            }
-            transplant(tree, z, y);
-            y->left = z->left;
-            y->left->parent = y;
-        }
-    }
-
-    free(z);
-}
-
-void avl_delete(AVL_tree *tree, AVL_Node *n)
-{
-    delete_node(tree, n);
-    // except we have to rebalance the three
-}
-
-AVL_Node *tree_search_bf(AVL_tree *tree, size_t size)
-{
-    if (tree == NULL)
+Treap_node *tree_search_bf(Treap_tree *tree, size_t size) {
+    if(tree == NULL || tree->root == NULL)
         return NULL;
+    Treap_node *best = NULL;
+    Treap_node *current = tree->root;
 
-    AVL_Node *current = tree->root;
-    AVL_Node *successor = NULL;
-    while (current != NULL)
-    {
-        int cmp = size - diskFreeSpace(current->disk);
-        if(cmp == 0)
-            return current;
-
-        if (cmp < 0)
-        {
-            successor = current;
+    while(current != NULL){
+        if(diskFreeSpace(current->disk) >= size){
+            best = current; //On a trouvé un meilleur et on doit forcément aller à gauche si on veut trouver mieux (propriété arbre binaire)
             current = current->left;
-        }
-        else
+        } else { //pas assez d'espace donc on doit aller où il y a des disques avec plus de stockage (cad à droite)
             current = current->right;
+        }
     }
-
-    if(successor == NULL)
-        return NULL;
-
-    return successor;
-}
-
-static int recalculate_balance_factor(AVL_Node *x)
-{
-    if(x == NULL)
-        return BALANCED;
-
-    return subtree_height(x->right) - subtree_height(x->left);
-}
-
-bool detect_imbalance(AVL_tree *tree)
-{
-    if(abs(recalculate_balance_factor(tree->root)) > 1)
-        return true;
-
-    return false;
+    return best;
 }
