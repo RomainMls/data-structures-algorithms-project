@@ -1,15 +1,10 @@
-
-#include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
-
-#include "BP.h"
+#include "BST_firstfit.h"
 #include "Disk.h"
 #include "File.h"
 #include "LinkedList.h"
-#include "BST_firstfit.h"
-/*
-    Implementation of the First-Fit strategy
-*/
+#include "BP.h"
 
 static int reverse_file_compare(const void *a, const void *b)
 {
@@ -18,74 +13,69 @@ static int reverse_file_compare(const void *a, const void *b)
 
 size_t binpacking(size_t diskSize, List *files, List *disks)
 {
-    llSort(files, reverse_file_compare);        // sorted in decreasing
+    llSort(files, reverse_file_compare); // sort files in decreasing order
 
-    if(llLength(files) == 0)
+    if (llLength(files) == 0)
         return 0;
 
-    AVL_tree *avl = avl_create();
-    if(avl == NULL)
-        return (size_t)(0);
+    Treap_tree *treap = treap_create();
+    if (treap == NULL)
+        return 0;
 
     size_t nbDisks = 0;
 
     Node *currentNode = llHead(files);
-    File *currentFile;
+    File *currentFile = NULL;
 
-    while(currentNode != NULL)
+    while (currentNode != NULL)
     {
         currentFile = llData(currentNode);
         size_t size = fileSize(currentFile);
-        if(size > diskSize)
+        if (size > diskSize)
         {
-            avl_free_with_freeDisk(avl);
-            printf("File size larger than disks' sizes\n");
-            while(llPopFirst(disks) != NULL);   // reset disks list to match the 0
-            return (size_t)(0);
+            treap_free(treap);
+            printf("File size larger than disk size.\n");
+            while (llPopFirst(disks) != NULL);
+            return 0;
         }
 
-        AVL_Node *resultNode = tree_search_ff(avl, size);
-        Disk *diskToStoreIn;
-        if(resultNode != NULL)
+        Treap_node *resultNode = tree_search_ff(treap, size);
+        Disk *diskToStoreIn = NULL;
+        if (resultNode != NULL)
         {
             diskToStoreIn = getDisk(resultNode);
-            size_t prev_size = diskFreeSpace(diskToStoreIn);
-            if(!diskAddFile(diskToStoreIn, currentFile))
+            treap_delete(treap, resultNode);
+
+            if (!diskAddFile(diskToStoreIn, currentFile))
             {
-                printf("BP_bestfit: can't add file to disk\n");
+                printf("BP_firstfit: can't add file to disk\n");
                 exit(1);
             }
-            avl_notify_update(avl, resultNode, prev_size);
+            treap_insert(treap, diskToStoreIn);
         }
         else
         {
             diskToStoreIn = diskCreate(diskSize);
-            if(diskToStoreIn == NULL)
+            if (diskToStoreIn == NULL)
             {
                 printf("BP_firstfit: allocation error.\n");
-                exit(1);
+                treap_free(treap);
+                return 0;
             }
             nbDisks++;
             llInsertLast(disks, diskToStoreIn);
-            if(!diskAddFile(diskToStoreIn, currentFile))
+
+            if (!diskAddFile(diskToStoreIn, currentFile))
             {
-                printf("BP_bestfit: can't add file to disk\n");
+                printf("BP_firstfit: can't add file to disk\n");
                 exit(1);
             }
-            avl_insert(avl, diskToStoreIn);
+            treap_insert(treap, diskToStoreIn);
         }
 
         currentNode = llNext(currentNode);
-
-        if(detect_imbalance(avl))
-        {
-            printf("BP_bestfit: imbalance detected\n");
-            exit(1);
-        }
     }
 
-    avl_free_without_freeDisk(avl);
+    treap_free(treap);
     return nbDisks;
 }
-
-

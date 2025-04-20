@@ -54,9 +54,6 @@ static void sift_upwards (Treap_tree *t, Treap_node *q)
   }
 }
 
-#define mcmp(x,y) \
-  (((int) (x) < (int) (y))? -1: (((int) (x) == (int) (y))? 0: 1))
-
 void treap_insert
   (Treap_tree *t, Disk *d)
 /* Inserts the pair (k,d) into the treap t. */
@@ -192,19 +189,30 @@ Disk *getDisk(Treap_node *n){
     return n->disk;
 }
 
-Treap_node *tree_search_bf(Treap_tree *tree, size_t size) {
-    if(tree == NULL || tree->root == NULL)
+Treap_node *tree_search_bf(Treap_tree *tree, size_t size)
+{
+    if (tree == NULL)
         return NULL;
-    Treap_node *best = NULL;
-    Treap_node *current = tree->root;
 
-    while(current != NULL){
-        if(diskFreeSpace(current->disk) >= size){
-            best = current; //On a trouvé un meilleur et on doit forcément aller à gauche si on veut trouver mieux (propriété arbre binaire)
+    Treap_node *current = tree->root;
+    Treap_node *successor = NULL;
+    while (current != NULL)
+    {
+        int cmp = size - diskFreeSpace(current->disk);
+        if(cmp == 0)
+            return current;
+
+        if (cmp < 0)
+        {
+            successor = current;
             current = current->left;
-        } else { //pas assez d'espace donc on doit aller où il y a des disques avec plus de stockage (cad à droite)
-            current = current->right;
         }
+        else
+            current = current->right;
     }
-    return best;
+
+    if(successor == NULL)
+        return NULL;
+
+    return successor;
 }

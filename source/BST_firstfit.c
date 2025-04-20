@@ -1,319 +1,239 @@
-#include <stdlib.h>
-#include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "BST_firstfit.h"
+#include "Disk.h"
 
-typedef enum
-{
-    LEFTIMBALANCE = -2,
-    LEFTHEAVY = -1,
-    BALANCED = 0,
-    RIGHTHEAVY = 1,
-    RIGHTIMBALANCE = 2
-}
-Balance_Factor;
+static size_t creation_counter = 0;
 
-struct AVL_Node_t
-{
-    int priority;
+struct Treap_node_t {
     Disk *disk;
+    int priority;
+    size_t creation_order;
     size_t subMax;
-    AVL_Node *parent;
-    AVL_Node *left;
-    AVL_Node *right;
-    Balance_Factor bf;
+    struct Treap_node_t *parent;
+    struct Treap_node_t *left;
+    struct Treap_node_t *right;
 };
 
-Disk *getDisk(AVL_Node *n)
-{
-    if(n != NULL)
-        return n->disk;
-
-    return NULL;
-}
-
-struct AVL_tree_t
-{
-    AVL_Node *root;
-    int counter;
+struct Treap_tree_t {
+    struct Treap_node_t *root;
 };
 
-AVL_tree *avl_create(void)
-{
-    AVL_tree *tree = malloc(sizeof(AVL_tree));
-    if(tree == NULL)
-        return NULL;
-
-    tree->root = NULL;
-    tree->counter = 0;
-
-    return tree;
-}
-
-static void free_subtree_with_freeDisk(AVL_tree *tree, AVL_Node *root)
-{
-    if(root == NULL)
-        return;
-
-    free_subtree_with_freeDisk(tree, root->left);
-    free_subtree_with_freeDisk(tree, root->right);
-
-    diskFree(root->disk);
-    free(root);
-}
-
-static void free_subtree_without_freeDisk(AVL_tree *tree, AVL_Node *root)
-{
-    if(root == NULL)
-        return;
-
-    free_subtree_without_freeDisk(tree, root->left);
-    free_subtree_without_freeDisk(tree, root->right);
-
-    free(root);
-}
-
-void avl_free_with_freeDisk(AVL_tree *tree)
-{
-    free_subtree_with_freeDisk(tree, tree->root);
-    free(tree);
-}
-
-void avl_free_without_freeDisk(AVL_tree *tree)
-{
-    free_subtree_without_freeDisk(tree, tree->root);
-    free(tree);
-}
-
-static int max(int a, int b)
-{
-    if(a > b)
-        return a;
-
-    return b;
-}
-
-static int subtree_height(AVL_Node *root)
-{
-    if(root == NULL)
-        return 0;
-
-    return 1 + max(subtree_height(root->left), subtree_height(root->right));
-}
-
-int avl_height(AVL_tree *tree)
-{
-    return subtree_height(tree->root);
-}
-
-static int calculate_balance_factor(AVL_Node *x)
-{
-    if(x == NULL)
-        return BALANCED;
-
-    return subtree_height(x->right) - subtree_height(x->left);
-}
-
-static size_t restore_subMax(AVL_tree *tree, AVL_Node *n)
-{
+static size_t redefine_node_submax(Treap_node *n) {
     if(n == NULL)
         return 0;
+    size_t l = 0, r = 0, temp_max = 0;
 
-    if(n->left == NULL && n->right == NULL)
-    {
-        n->subMax = diskFreeSpace(n->disk);
-        return n->subMax;
-    }
+    if(n->left != NULL)
+        l = n->left->subMax;
+    if(n->right != NULL)
+        r = n->right->subMax;
 
-    size_t leftMax = restore_subMax(tree, n->left);
-    size_t rightMax = restore_subMax(tree, n->right);
-
-    if(n->left == NULL && n->right != NULL)
-    {
-        if(diskFreeSpace(n->disk) > rightMax)
-        {
-            n->subMax = diskFreeSpace(n->disk);
-            return n->subMax;
-        }
-        else
-        {
-            n->subMax = rightMax;
-            return rightMax;
-        }
-    }
-
-    if(n->right == NULL && n->left != NULL)
-    {
-        if(diskFreeSpace(n->disk) > leftMax)
-        {
-            n->subMax = diskFreeSpace(n->disk);
-            return n->subMax;
-        }
-        else
-        {
-            n->subMax = leftMax;
-            return leftMax;
-        }
-    }
-
-    if(leftMax > rightMax)
-    {
-        if(diskFreeSpace(n->disk) > leftMax)
-        {
-            n->subMax = diskFreeSpace(n->disk);
-            return n->subMax;
-        }
-        else
-        {
-            n->subMax = leftMax;
-            return leftMax;
-        }
-    }
+    if(l > r)
+        temp_max = l;
     else
-    {
-        if(diskFreeSpace(n->disk) > rightMax)
-        {
-            n->subMax = diskFreeSpace(n->disk);
-            return n->subMax;
-        }
-        else
-        {
-            n->subMax = rightMax;
-            return rightMax;
-        }
-    }
-
-    return n->subMax;
+        temp_max = r;
+    
+    if(temp_max > diskFreeSpace(n->disk))
+        return temp_max;
+    else
+        return diskFreeSpace(n->disk);
 }
 
-static AVL_Node *left_rotate(AVL_tree *tree, AVL_Node *x)
-{
-    if(x == NULL || x->right == NULL)
-        return x;
-
-    AVL_Node *y = x->right;
-
-    y->parent = x->parent;
-    if(x->parent == NULL)
-        tree->root = y;
-    else
-    {
-        if(x == x->parent->left)
-            x->parent->left = y;
-        else
-            x->parent->right = y;
-    }
-
-    x->right = y->left;
-    if(y->left != NULL)
-        y->left->parent = x;
-
-    y->left = x;
-    x->parent = y;
-
-    x->bf = calculate_balance_factor(x);
-    y->bf = calculate_balance_factor(y);
-
-    return y;
-}
-
-static AVL_Node *right_rotate(AVL_tree *tree, AVL_Node *x)
-{
-    if(x == NULL || x->left == NULL)
-        return x;
-
-    AVL_Node *y = x->left;
-
-    y->parent = x->parent;
-    if(x->parent == NULL)
-        tree->root = y;
-    else
-    {
-        if(x == x->parent->left)
-            x->parent->left = y;
-        else
-            x->parent->right = y;
-    }
-
-    x->left = y->right;
-    if(y->right != NULL)
-        y->right->parent = x;
-
-    y->right = x;
-    x->parent = y;
-
-    x->bf = calculate_balance_factor(x);
-    y->bf = calculate_balance_factor(y);
-
-    return y;
-}
-
-bool avl_insert(AVL_tree *tree, Disk *disk)
-{
-    AVL_Node *y = NULL;
-    AVL_Node *x = tree->root;
-    AVL_Node *z = malloc(sizeof(AVL_Node));
-    if(z == NULL)
-        return false;
-
-    z->disk = disk;
-    z->left = NULL;
-    z->right = NULL;
-    z->bf = BALANCED;
-    z->priority = ++(tree->counter);
-
-    while(x != NULL)
-    {
-        y = x;
-        x = x->right;
-    }
-
-    z->parent = y;
-    if(y == NULL)
-        tree->root = z;
-    else
-        y->right = z;
-
-    AVL_Node *n = z->parent;
-    while(n != NULL)
-    {
-        Balance_Factor bf = calculate_balance_factor(n);
-
-        if(bf == RIGHTIMBALANCE)
-        {
-            if(calculate_balance_factor(n->right) >= BALANCED)
-            {
-                n = left_rotate(tree, n);
-                restore_subMax(tree, n->parent);
-            }
-            else
-            {
-                n->right = right_rotate(tree, n->right);
-                n = left_rotate(tree, n);
-                restore_subMax(tree, n->parent);
-            }
-        }
-        else if(bf == LEFTIMBALANCE)
-        {
-            if(calculate_balance_factor(n->left) <= BALANCED)
-            {   n = right_rotate(tree, n);
-                restore_subMax(tree, n->parent);
-            }
-            else
-            {
-                n->left = left_rotate(tree, n->left);
-                n = right_rotate(tree, n);
-                restore_subMax(tree, n->parent);
-            }
-        }
+static void update_submax_branch(Treap_node *n) {
+    while(n != NULL){
+        n->subMax = redefine_node_submax(n);
         n = n->parent;
     }
-    restore_subMax(tree, z);
-    return true;
 }
 
-static AVL_Node *tree_search_ff_node(AVL_Node *root, size_t size)
+static void sift_upwards (Treap_tree *t, Treap_node *q)
+/* On entry, t is an ordered tree, where the only node violating the
+   property is q.  Moreover, the subtree rooted at q is a treap.
+   Rotates q upwards until the treap property is restored for t.
+*/
+{
+  Treap_node *p, *n;
+
+  while ((q->parent != NULL) && (q->parent->priority < q->priority)) {
+    p = q->parent;
+    q->parent = p->parent;
+    p->parent = q;
+
+    if (q->parent != NULL) {
+      if (q->parent->left == p)
+	q->parent->left = q;
+      else
+	q->parent->right = q;
+    } else
+      t->root = q;
+
+/*  rotation à droite      rotation à gauche
+     avant  après             avant  après 
+    p 54     q 46           p 54          q 56
+   / \      / \            / \           / \
+  q 46         p 54           q 56      p 54
+ / \          / \            / \       / \
+    n 49     n 49        67 n             n 67
+   / \      / \            / \           / \    
+On voit bien que le changement des submax à faire est local et sur p et q
+*/
+    if (q == p->left) {  /* right rotation */
+      n = q->right;
+      q->right  = p;
+      p->left   = n;
+    } else { /* left rotation */
+      n = q->left;
+      q->left = p;
+      p->right = n;
+    }
+    if (n != NULL) n->parent = p;
+
+    p->subMax = redefine_node_submax(p);
+    q->subMax = redefine_node_submax(q);
+  }
+}
+
+void treap_insert
+  (Treap_tree *t, Disk *d)
+/* Inserts the pair (k,d) into the treap t. */
+{
+  Treap_node *n = t->root;    /* The current node we are examining in
+				   our path down through the tree. */
+  Treap_node *q = NULL;  /* The new node which we are inserting
+				   into the tree. */
+
+  q = (Treap_node *) malloc (sizeof(Treap_node));
+  q->left = q->right = q->parent = NULL;
+  q->creation_order = creation_counter++;
+  q->subMax = diskFreeSpace(d);
+  q->disk = d;
+  q->priority = rand();
+
+  /* If the treap is initially empty, then we treat this as a special
+     case: */
+  
+  if (t->root == NULL) {
+    t->root = q;
+    return;
+  }
+
+  /* Now we search down through the treap, looking for where to insert
+     our node: */
+  while (n != NULL) {
+    q->parent = n;
+    if (q->creation_order < n->creation_order)
+        n = n->left;
+    else
+        n = n->right;
+  }
+
+  if (q->parent->creation_order > q->creation_order)
+    q->parent->left = q;
+  else
+    q->parent->right = q;
+
+  /* At this point, q has been inserted into the tree as a leaf,
+     and the ordering of the keys of the tree has been maintained.
+     We now need to move q upwards through the tree in order to
+     restore the heap order.
+     */
+  update_submax_branch(q->parent); //Re actualiser les submax
+  sift_upwards (t, q); //Refaire le treap correctement
+}
+
+
+void treap_delete 
+  (Treap_tree *t, Treap_node *p)
+/* Searches the treap t for an element whose key matches *k.
+   If found, deletes the element, sets *k equal to the key pointer in
+   that that element, and returns the associated data.  If not found,
+   returns NULL.
+*/
+{
+  Treap_node *n, *q;    /* descendants of p. */
+
+  /* At this point, p points to our node.  We must push it down to a 
+     leaf, and then we can detach the leaf. */
+  while ((p->left != NULL) && (p->right != NULL)) {
+    if (p->left->priority > p->right->priority) { /* right rotation */
+      q = p->left;
+      n = q->right;
+      q->right = p;
+      p->left = n;
+    } else { /* left rotation */
+      q = p->right;
+      n = q->left;
+      q->left = p;
+      p->right = n;
+    }
+    if (p->parent != NULL) {
+      if (p->parent->left == p)
+	p->parent->left = q;
+      else
+	p->parent->right = q;
+    } else
+      t->root = q;
+    q->parent = p->parent;
+    p->parent = q;
+    if (n != NULL) n->parent = p;
+  }
+
+  /* At this point, either p's left child is NULL or p's right child
+     is NULL, so we can safely remove p from the tree. */
+  if (p->left == NULL)
+    q = p->right;
+  else
+    q = p->left;
+  if (q != NULL) q->parent = p->parent;
+
+  if (p->parent != NULL) {
+    if (p == p->parent->left)
+      p->parent->left = q;
+    else
+      p->parent->right = q;
+    update_submax_branch(p->parent); 
+    //Comme on pousse le noeud a supprimé jusqu'au fond de la branche sans impacter d'autres branches, on 
+    //a qu'à refaire les submax de cette branche
+  } else
+    t->root = q;
+
+  free(p);
+}
+
+
+Treap_tree *treap_create(void){
+    Treap_tree *t = malloc(sizeof(Treap_tree));
+    if(t == NULL)
+        return NULL;
+    
+    t->root = NULL;
+    return t;
+}
+
+static void treap_free_subtree(Treap_node *n){
+    if(n == NULL)
+        return;
+    treap_free_subtree(n->left);
+    treap_free_subtree(n->right);
+    free(n);
+}
+
+void treap_free(Treap_tree *t){
+    if(t == NULL)
+        return;
+    treap_free_subtree(t->root);
+}
+
+Disk *getDisk(Treap_node *n){
+    if(n == NULL)
+        return NULL;
+    return n->disk;
+}
+
+
+static Treap_node *tree_search_ff_node(Treap_node *root, size_t size)
 {
     if(root == NULL)
         return NULL;
@@ -321,7 +241,7 @@ static AVL_Node *tree_search_ff_node(AVL_Node *root, size_t size)
     if(root->subMax < size)
         return NULL;
 
-    AVL_Node *currentBest = root;
+    Treap_node *currentBest = root;
 
     while(currentBest->left != NULL && currentBest->left->subMax >= size)
         currentBest = currentBest->left;
@@ -332,51 +252,7 @@ static AVL_Node *tree_search_ff_node(AVL_Node *root, size_t size)
         return tree_search_ff_node(currentBest->right, size);
 }
 
-AVL_Node *tree_search_ff(AVL_tree *tree, size_t size)
+Treap_node *tree_search_ff(Treap_tree *tree, size_t size)
 {
     return tree_search_ff_node(tree->root, size);
-}
-
-void avl_notify_update(AVL_tree *tree, AVL_Node *modified_node, size_t prev_size)
-{
-    /*  Nodes to be updates:
-        (Their subMax can only decrease since the disk size has decreased)
-        The node that contains the disk given as argument
-        and all of its parents to the root
-    */
-    if(modified_node == NULL)
-        return;
-
-    if(modified_node->subMax == prev_size)
-        restore_subMax(tree, modified_node);
-
-    else
-        // modification has no impact on the subMax structure
-        return;
-
-    AVL_Node *current = modified_node->parent;
-
-    while(current != NULL)
-    {
-        if(current->subMax == prev_size)
-        {
-            // that means that the submax was probably due to the modified file
-            // we should update it
-            restore_subMax(tree, current);
-        }
-        else
-            // if the previous size wasn't the submax for current
-            // it isn't for its parent
-            break;
-
-        current = current->parent;
-    }
-}
-
-bool detect_imbalance(AVL_tree *tree)
-{
-    if(abs(calculate_balance_factor(tree->root)) > 1)
-        return true;
-
-    return false;
 }

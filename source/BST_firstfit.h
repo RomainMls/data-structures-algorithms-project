@@ -1,29 +1,25 @@
-#ifndef  BST_FIRSTFIT_H_DEFINED
-#define  BST_FIRSTFIT_H_DEFINED
-
-#include <stdbool.h>
+/*
+   Copyright (C) 1993 by Matthew Clegg.  All rights reserved.
+*/
 #include "Disk.h"
+#include <stdlib.h>
 
-typedef struct AVL_Node_t AVL_Node;
+typedef struct Treap_node_t Treap_node;
 
-Disk *getDisk(AVL_Node *n);
+typedef struct Treap_tree_t Treap_tree;
 
-typedef struct AVL_tree_t AVL_tree;
+void treap_insert
+  (Treap_tree *t, Disk *d);
+/* Inserts the pair (k,d) into the treap t.  Assumes on entry that no
+   node currently exists in the treap with key k. 
+*/
 
-AVL_tree *avl_create(void);
+void treap_delete(Treap_tree *t, Treap_node *node_to_delete);
 
-void avl_free_without_freeDisk(AVL_tree *tree);
+Treap_tree *treap_create(void);
 
-void avl_free_with_freeDisk(AVL_tree *tree);
+void treap_free(Treap_tree *t);
 
-int avl_height(AVL_tree *tree);
+Disk *getDisk(Treap_node *n);
 
-bool avl_insert(AVL_tree *tree, Disk *disk);
-
-AVL_Node *tree_search_ff(AVL_tree *tree, size_t size);
-
-void avl_notify_update(AVL_tree *tree, AVL_Node *modified_node, size_t prev_size);
-
-bool detect_imbalance(AVL_tree *tree);
-
-#endif // BST_FIRSTFIT_H_DEFINED
+Treap_node *tree_search_ff(Treap_tree *tree, size_t size);
