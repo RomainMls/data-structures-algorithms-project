@@ -1,4 +1,4 @@
-/* treap.c
+/*
    Copyright (C) 1993 by Matthew Clegg.  All rights reserved.
 
    Implementation of treap data structure.
