@@ -143,66 +143,6 @@ void treap_insert
   sift_upwards (t, q); //Refaire le treap correctement
 }
 
-
-void treap_delete
-  (Treap_tree *t, Treap_node *p)
-/* Searches the treap t for an element whose key matches *k.
-   If found, deletes the element, sets *k equal to the key pointer in
-   that that element, and returns the associated data.  If not found,
-   returns NULL.
-*/
-{
-  Treap_node *n, *q;    /* descendants of p. */
-
-  /* At this point, p points to our node.  We must push it down to a
-     leaf, and then we can detach the leaf. */
-  while ((p->left != NULL) && (p->right != NULL)) {
-    if (p->left->priority > p->right->priority) { /* right rotation */
-      q = p->left;
-      n = q->right;
-      q->right = p;
-      p->left = n;
-    } else { /* left rotation */
-      q = p->right;
-      n = q->left;
-      q->left = p;
-      p->right = n;
-    }
-    if (p->parent != NULL) {
-      if (p->parent->left == p)
-	p->parent->left = q;
-      else
-	p->parent->right = q;
-    } else
-      t->root = q;
-    q->parent = p->parent;
-    p->parent = q;
-    if (n != NULL) n->parent = p;
-  }
-
-  /* At this point, either p's left child is NULL or p's right child
-     is NULL, so we can safely remove p from the tree. */
-  if (p->left == NULL)
-    q = p->right;
-  else
-    q = p->left;
-  if (q != NULL) q->parent = p->parent;
-
-  if (p->parent != NULL) {
-    if (p == p->parent->left)
-      p->parent->left = q;
-    else
-      p->parent->right = q;
-    update_submax_branch(p->parent);
-    //Comme on pousse le noeud a supprimé jusqu'au fond de la branche sans impacter d'autres branches, on
-    //a qu'à refaire les submax de cette branche
-  } else
-    t->root = q;
-
-  free(p);
-}
-
-
 Treap_tree *treap_create(void){
     Treap_tree *t = malloc(sizeof(Treap_tree));
     if(t == NULL)
