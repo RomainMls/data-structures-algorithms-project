@@ -14,8 +14,6 @@ void treap_insert
    node currently exists in the treap with key k.
 */
 
-void treap_delete(Treap_tree *t, Treap_node *node_to_delete);
-
 Treap_tree *treap_create(void);
 
 void treap_free(Treap_tree *t);
