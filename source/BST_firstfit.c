@@ -34,7 +34,7 @@ static size_t redefine_node_submax(Treap_node *n) {
         temp_max = l;
     else
         temp_max = r;
-    
+
     if(temp_max > diskFreeSpace(n->disk))
         return temp_max;
     else
@@ -70,13 +70,13 @@ static void sift_upwards (Treap_tree *t, Treap_node *q)
       t->root = q;
 
 /*  rotation à droite      rotation à gauche
-     avant  après             avant  après 
+     avant  après             avant  après
     p 54     q 46           p 54          q 56
    / \      / \            / \           / \
   q 46         p 54           q 56      p 54
  / \          / \            / \       / \
     n 49     n 49        67 n             n 67
-   / \      / \            / \           / \    
+   / \      / \            / \           / \
 On voit bien que le changement des submax à faire est local et sur p et q
 */
     if (q == p->left) {  /* right rotation */
@@ -113,7 +113,7 @@ void treap_insert
 
   /* If the treap is initially empty, then we treat this as a special
      case: */
-  
+
   if (t->root == NULL) {
     t->root = q;
     return;
@@ -144,7 +144,7 @@ void treap_insert
 }
 
 
-void treap_delete 
+void treap_delete
   (Treap_tree *t, Treap_node *p)
 /* Searches the treap t for an element whose key matches *k.
    If found, deletes the element, sets *k equal to the key pointer in
@@ -154,7 +154,7 @@ void treap_delete
 {
   Treap_node *n, *q;    /* descendants of p. */
 
-  /* At this point, p points to our node.  We must push it down to a 
+  /* At this point, p points to our node.  We must push it down to a
      leaf, and then we can detach the leaf. */
   while ((p->left != NULL) && (p->right != NULL)) {
     if (p->left->priority > p->right->priority) { /* right rotation */
@@ -193,8 +193,8 @@ void treap_delete
       p->parent->left = q;
     else
       p->parent->right = q;
-    update_submax_branch(p->parent); 
-    //Comme on pousse le noeud a supprimé jusqu'au fond de la branche sans impacter d'autres branches, on 
+    update_submax_branch(p->parent);
+    //Comme on pousse le noeud a supprimé jusqu'au fond de la branche sans impacter d'autres branches, on
     //a qu'à refaire les submax de cette branche
   } else
     t->root = q;
@@ -207,7 +207,7 @@ Treap_tree *treap_create(void){
     Treap_tree *t = malloc(sizeof(Treap_tree));
     if(t == NULL)
         return NULL;
-    
+
     t->root = NULL;
     return t;
 }
@@ -255,4 +255,30 @@ static Treap_node *tree_search_ff_node(Treap_node *root, size_t size)
 Treap_node *tree_search_ff(Treap_tree *tree, size_t size)
 {
     return tree_search_ff_node(tree->root, size);
+}
+
+void treap_notify(Treap_node *n, size_t prev)
+{
+  size_t new = diskFreeSpace(n->disk);
+
+  if(new > prev)
+  {
+    fprintf(stderr, "treap_notify(): this function only handles a decrease in disk free space\n");
+    exit(1);
+  }
+
+  n->subMax = redefine_node_submax(n);
+
+  Treap_node *current = n->parent;
+
+  while(current != NULL)
+  {
+    if(current->subMax == prev)
+    {
+      current->subMax = redefine_node_submax(current);
+      current = current->parent;
+    }
+    else
+      break;
+  }
 }

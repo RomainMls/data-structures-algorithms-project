@@ -44,14 +44,14 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
         if (resultNode != NULL)
         {
             diskToStoreIn = getDisk(resultNode);
-            treap_delete(treap, resultNode);
 
+            size_t prev_size = diskFreeSpace(diskToStoreIn);
             if (!diskAddFile(diskToStoreIn, currentFile))
             {
                 printf("BP_firstfit: can't add file to disk\n");
                 exit(1);
             }
-            treap_insert(treap, diskToStoreIn);
+            treap_notify(resultNode, prev_size);
         }
         else
         {
