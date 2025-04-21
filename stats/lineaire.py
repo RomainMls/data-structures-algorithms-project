@@ -12,6 +12,7 @@ with open("stats.txt", "r") as f:
 data = {
     "bpnextfit": {"x": [], "lost": []},
     "bpworstfit": {"x": [], "lost": []},
+    "bpbestfit": {"x": [], "lost": []},
     "bpfirstfit": {"x": [], "lost": []}
 }
 
@@ -31,10 +32,10 @@ def compute_slope(x, y):
     x = np.array(x).reshape(-1, 1)
     y = np.array(y)
     model = LinearRegression().fit(x, y)
-    return model.coef_[0], model.intercept_
+    return model.coef_[0]
 
 # Calculate and print results
-for key in ["bpnextfit", "bpworstfit", "bpfirstfit"]:
-    slope, intercept = compute_slope(data[key]["x"], data[key]["lost"])
+for key in ["bpnextfit", "bpworstfit", "bpbestfit", "bpfirstfit"]:
+    slope = compute_slope(data[key]["x"], data[key]["lost"])
     name = key.replace("bp", "").capitalize().replace("fit", " Fit")
-    print(f"{name} slope: {slope:.2f}, intercept: {intercept:.2f}")
+    print(f"{name} slope: {slope:.2f}")

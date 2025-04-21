@@ -67,16 +67,3 @@ plt.legend()
 plt.grid(True)
 plt.tight_layout()
 plt.savefig("lost_comparaison_bestfit_firstfit.pdf")
-
-# Plot avg time for only Next Fit and Worst Fit
-plt.figure(figsize=(12, 6))
-for algo in ["Next Fit", "Worst Fit"]:
-    plt.plot(data[algo]["x"], data[algo]["time"], label=algo)
-plt.title("Comparaison du temps de calcul")
-plt.xlabel("Nombre de fichiers")
-plt.ylabel("Temps (secondes)")
-plt.legend()
-plt.grid(True)
-plt.tight_layout()
-plt.savefig("time_comparaison_nextfit_worstfit.pdf")
-

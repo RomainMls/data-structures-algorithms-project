@@ -22,41 +22,6 @@
 // necessary for some string function
 #define _POSIX_C_SOURCE 200809L
 
-static List *readFiles(char *filename)
-{
-    FILE *csvfile = fopen(filename, "r");
-    if (!csvfile)
-    {
-        fprintf(stderr, "Could not open file %s\n", filename);
-        return NULL;
-    }
-
-    List *files = llCreateEmpty();
-    char line[1024];
-    while (fgets(line, 1024, csvfile))
-    {
-        if (strlen(line) <= 1)
-            continue;
-
-        //Strdup did not work, so I remplace it by malloc + strcpy
-        char *name = strtok(line, ",");
-        size_t size = strtoull(strtok(NULL, ",\n"), NULL, 10);
-
-        char *name_copy = malloc(strlen(name) + 1);
-        if (!name_copy)
-        {
-            fprintf(stderr, "Memory allocation failed for file name\n");
-            return NULL;
-        }
-
-        strcpy(name_copy, name);
-
-        File *file = fileCreate(name_copy, size);
-        llInsertLast(files, file);
-    }
-    return files;
-}
-
 static List *generateRandomFiles(size_t diskSize, size_t nbFiles)
 {
     List *files = llCreateEmpty();
@@ -81,93 +46,57 @@ static List *generateRandomFiles(size_t diskSize, size_t nbFiles)
     return files;
 }
 
-static void printSolution(size_t diskSize, List *files, List *disks)
-{
-    Node *p;
-
-    size_t totalsize = 0;
-    p = llHead(files);
-    while (p)
-    {
-        totalsize += fileSize(llData(p));
-        p = llNext(p);
-    }
-    printf("Total file sizes: %zu\n", totalsize);
-    printf("Disk size: %zu\n", diskSize);
-    printf("Minimum/Maximum number of disks: %zu/%zu\n",
-           (size_t)ceill((double)totalsize / (double)diskSize),
-           llLength(files));
-    printf("Number of disks in solution: %zu\n", llLength(disks));
-    printf("Lost space: %zu\n", llLength(disks) * diskSize - totalsize);
-
-    if (llLength(files) > 100)
-    {
-        printf("Too many files. No print.\n");
-        return;
-    }
-
-    p = llHead(disks);
-    int indexdisk = 0;
-    while (p)
-    {
-        Disk *d = llData(p);
-        printf("Disk %d: used space: %zu, free space: %zu\n", indexdisk++, diskUsedSpace(d), diskFreeSpace(d));
-        List *dfiles = diskFiles(d);
-        printf("Files (%zu): ", llLength(dfiles));
-        Node *pf = llHead(dfiles);
-        while (pf)
-        {
-            File *f = llData(pf);
-            printf("[%s, %zu]", fileName(f), fileSize(f));
-            pf = llNext(pf);
-        }
-        printf("\n");
-        p = llNext(p);
-    }
-}
-
 int main(int argc, char *argv[])
 {
     // srand(time(NULL));
 
     srand(42);
 
-    if (argc != 3)
+    size_t diskSize = 1000000;
+    List *disks;
+
+    if(argc != 3)
     {
-        fprintf(stderr, "Usage: %s <disk_size> [<csv_file>|number_of_files]\n", argv[0]);
-        return 1;
+        printf("Missing arguments. Usage: <nbFiles> <nbTests>\n");
+        return 0;
     }
-
-    size_t diskSize = strtoull(argv[1], NULL, 10);
-
-    int i = 0;
-    while (argv[2][i] != '\0' && isdigit(argv[2][i]))
-        i++;
+    size_t nbFiles = strtoull(argv[1], NULL, 10);
+    int nbTests = strtoull(argv[2], NULL, 10);
 
     List *files;
-    if (argv[2][i] == '\0')
+
+    int i = 0;
+    long totalLost = 0;
+    double totalTime = 0;
+    while(i < nbTests)
     {
-        // random files
-        size_t nbFiles = strtoull(argv[2], NULL, 10);
+        disks = llCreateEmpty();
         files = generateRandomFiles(diskSize, nbFiles);
+        clock_t start = clock();
+
+        binpacking(diskSize, files, disks);
+
+        clock_t end = clock();
+
+        totalTime += ((double)(end - start)) / (double)CLOCKS_PER_SEC;
+
+        Node *current = llHead(disks);
+        Disk *currentFile;
+        while(current != NULL)
+        {
+            currentFile = llData(current);
+            totalLost += diskFreeSpace(currentFile);
+            current = llNext(current);
+        }
+
+        llFree(disks);
+        llFree(files);
+        i++;
     }
-    else
-        files = readFiles(argv[2]);
+    double avgTime = totalTime / nbTests;
+    long avgLost = totalLost / nbTests;
 
-    List *disks = llCreateEmpty();
-
-    clock_t start = clock();
-
-    binpacking(diskSize, files, disks);
-
-    clock_t end = clock();
-
-    printf("CPU time: %f\n", (double)(end - start) / (double)CLOCKS_PER_SEC);
-
-    printSolution(diskSize, files, disks);
-
-    llFreeData(disks, diskFree);
-    llFreeData(files, fileFree);
+    printf("avg time = %f\navg lost = %ld\n", avgTime, avgLost);
 
     return 0;
 }

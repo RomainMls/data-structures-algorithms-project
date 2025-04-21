@@ -1,123 +1,123 @@
-./bpnextfit 10000 5
-avg time = 0.002962
-avg lost = 1451517142
-./bpnextfit 20000 5
-avg time = 0.005738
-avg lost = 2904486769
-./bpnextfit 30000 5
-avg time = 0.007141
-avg lost = 4349064797
-./bpnextfit 40000 5
-avg time = 0.010358
-avg lost = 5788181103
-./bpnextfit 50000 5
-avg time = 0.014331
-avg lost = 7241853316
-./bpnextfit 60000 5
-avg time = 0.017022
-avg lost = 8690399786
-./bpnextfit 70000 5
-avg time = 0.021262
-avg lost = 10141858908
-./bpnextfit 80000 5
-avg time = 0.023697
-avg lost = 11597476568
-bpnextfit 90000 5
-avg time = 0.028351
-avg lost = 13042726618
-bpnextfit 100000 5
-avg time = 0.034490
-avg lost = 14485891070
+./bpnextfit 100000 10
+avg time = 0.069191
+avg lost = 14476681518
+./bpnextfit 200000 10
+avg time = 0.160744
+avg lost = 28957868893
+./bpnextfit 300000 10
+avg time = 0.255507
+avg lost = 43454146091
+./bpnextfit 400000 10
+avg time = 0.371627
+avg lost = 57927626277
+./bpnextfit 500000 10
+avg time = 0.500041
+avg lost = 72441915147
+./bpnextfit 600000 10
+avg time = 0.622381
+avg lost = 86901937989
+./bpnextfit 700000 10
+avg time = 0.757083
+avg lost = 101399333694
+./bpnextfit 800000 10
+avg time = 0.888722
+avg lost = 115879478967
+./bpnextfit 900000 10
+avg time = 1.038402
+avg lost = 130366371046
+./bpnextfit 1000000 10
+avg time = 1.270412
+avg lost = 144840487887
 
-./bpworstfit 10000 5
-avg time = 0.004176
-avg lost = 1434317142
-./bpworstfit 20000 5
-avg time = 0.006994
-avg lost = 2878086769
-./bpworstfit 30000 5
-avg time = 0.009599
-avg lost = 4347664797
-./bpworstfit 40000 5
-avg time = 0.013598
-avg lost = 5786181103
-./bpworstfit 50000 5
-avg time = 0.016763
-avg lost = 7244853316
-./bpworstfit 60000 5
-avg time = 0.020933
-avg lost = 8715799786
-./bpworstfit 70000 5
-avg time = 0.025567
-avg lost = 10175258908
-./bpworstfit 80000 5
-avg time = 0.031534
-avg lost = 11629876568
-./bpworstfit 90000 5
-avg time = 0.035632
-avg lost = 13056126618
-./bpworstfit 100000 5
-avg time = 0.040811
-avg lost = 14523691070
+./bpworstfit 100000 10
+avg time = 0.066289
+avg lost = 14498581518
+./bpworstfit 200000 10
+avg time = 0.165614
+avg lost = 28673568893
+./bpworstfit 300000 10
+avg time = 0.274085
+avg lost = 43526046091
+./bpworstfit 400000 10
+avg time = 0.408593
+avg lost = 58030826277
+./bpworstfit 500000 10
+avg time = 0.503227
+avg lost = 71633015147
+./bpworstfit 600000 10
+avg time = 0.651147
+avg lost = 85946037989
+./bpworstfit 700000 10
+avg time = 0.751395
+avg lost = 100273933694
+./bpworstfit 800000 10
+avg time = 0.891884
+avg lost = 114603178967
+./bpworstfit 900000 10
+avg time = 1.049683
+avg lost = 130582971046
+./bpworstfit 1000000 10
+avg time = 1.179637
+avg lost = 145082287887
 
-./bpbestfit 10000 5
-avg time = 0.435102
-avg lost = 28917142
-./bpbestfit 20000 5
-avg time = 1.420102
-avg lost = 42886769
-./bpbestfit 30000 5
-avg time = 3.146650
-avg lost = 74464797
-./bpbestfit 40000 5
-avg time = 6.620482
-avg lost = 119581103
-./bpbestfit 50000 5
-avg time = 9.936509
-avg lost = 176253316
-./bpbestfit 60000 5
-avg time = 14.716602
-avg lost = 238999786
-./bpbestfit 70000 5
-avg time = 20.392178
-avg lost = 314658908
-./bpbestfit 80000 5
-avg time = 27.080030
-avg lost = 414476568
-./bpbestfit 90000 5
-avg time = 31.938739
-avg lost = 517126618
-./bpbestfit 100000 5
-avg time = 41.594703
-avg lost = 628091070
+./bpbestfit 100000 10
+avg time = 0.086444
+avg lost = 77522618
+./bpbestfit 200000 10
+avg time = 0.214227
+avg lost = 112274485
+./bpbestfit 300000 10
+avg time = 0.355917
+avg lost = 124611065
+./bpbestfit 400000 10
+avg time = 0.509254
+avg lost = 166489754
+./bpbestfit 500000 10
+avg time = 0.645220
+avg lost = 185417440
+./bpbestfit 600000 10
+avg time = 0.815995
+avg lost = 205461116
+./bpbestfit 700000 10
+avg time = 0.973899
+avg lost = 182978215
+./bpbestfit 800000 10
+avg time = 1.104967
+avg lost = 167920135
+./bpbestfit 900000 10
+avg time = 1.272827
+avg lost = 215153171
+./bpbestfit 1000000 10
+avg time = 1.464392
+avg lost = 284827428
 
-./bpfirstfit 10000 5
-avg time = 0.467225
-avg lost = 24517142
-./bpfirstfit 20000 5
-avg time = 2.070194
-avg lost = 25486769
-./bpfirstfit 30000 5
-avg time = 5.526127
-avg lost = 34064797
-./bpfirstfit 40000 5
-avg time = 9.945520
-avg lost = 34381103
-./bpfirstfit 50000 5
-avg time = 15.976980
-avg lost = 41853316
-./bpfirstfit 60000 5
-avg time = 23.542607
-avg lost = 46399786
-./bpfirstfit 70000 5
-avg time = 31.347301
-avg lost = 49258908
-./bpfirstfit 80000 5
-avg time = 40.107540
-avg lost = 70276568
-./bpfirstfit 90000 5
-avg time = 49.514338
-avg lost = 57126618
-./bpfirstfit 100000 5
-avg time = 62.394036
-avg lost = 65291070
+./bpfirstfit 100000 10
+avg time = 0.082209
+avg lost = 82779704
+./bpfirstfit 200000 10
+avg time = 0.200829
+avg lost = 119492925
+./bpfirstfit 300000 10
+avg time = 0.315377
+avg lost = 135322924
+./bpfirstfit 400000 10
+avg time = 0.473290
+avg lost = 156016832
+./bpfirstfit 500000 10
+avg time = 0.592241
+avg lost = 163091900
+./bpfirstfit 600000 10
+avg time = 0.725946
+avg lost = 192532739
+./bpfirstfit 700000 10
+avg time = 0.890712
+avg lost = 213831048
+./bpfirstfit 800000 10
+avg time = 1.070337
+avg lost = 230970498
+./bpfirstfit 900000 10
+avg time = 1.245850
+avg lost = 228785456
+./bpfirstfit 1000000 10
+avg time = 1.377924
+avg lost = 212261228
