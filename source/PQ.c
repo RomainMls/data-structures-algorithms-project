@@ -18,7 +18,10 @@ PQ *pqCreate(size_t capacity, int (*compare)(const void *, const void *))
 
     newPQ->array = malloc(capacity * sizeof(void *));
     if(newPQ->array == NULL)
+    {
+        free(newPQ);
         return NULL;
+    }
 
     newPQ->capacity = capacity;
     newPQ->size = 0;
@@ -42,7 +45,7 @@ bool pqInsert(PQ* pq, void *key)
     pq->array[i] = key;
 
     // max heapify
-    while(i > 0 && pq->compare(pq->array[i/2], pq->array[i])  < 0)       // i/2 is the parent of i
+    while(i > 0 && pq->compare(pq->array[i/2], pq->array[i]) < 0)       // i/2 is the parent of i
     {
         void *temp = pq->array[i/2];
         pq->array[i/2] = pq->array[i];
@@ -62,6 +65,29 @@ void *pqGetMax(const PQ* pq)
     return NULL;
 }
 
+static void max_heapify(PQ *pq, size_t i)
+{
+    size_t l = 2 * i + 1;
+    size_t r = 2 * i + 2;
+
+    size_t max;
+    if(l < pq->size && pq->compare(pq->array[l], pq->array[i]) > 0)
+        max = l;
+    else
+        max = i;
+    if(r < pq->size && pq->compare(pq->array[r], pq->array[max]) > 0)
+        max = r;
+
+    if(max != i)
+    {
+        // swap i et max
+        void *tmp = pq->array[i];
+        pq->array[i] = pq->array[max];
+        pq->array[max] = tmp;
+        max_heapify(pq, max);
+    }
+}
+
 void *pqExtractMax(PQ* pq)
 {
     if(pq->size < 1)
@@ -70,7 +96,7 @@ void *pqExtractMax(PQ* pq)
     void *max = pq->array[0];
     pq->array[0] = pq->array[pq->size-1];
     pq->size--;
-    // maxheapify(pq->array, 0);
+    max_heapify(pq, 0);
     return max;
 }
 

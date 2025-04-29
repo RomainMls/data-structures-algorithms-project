@@ -11,13 +11,14 @@
     Implementation of the Worst-Fit strategy
 */
 
-static int compare(const void *a, const void *b){
-    return (fileSize((File *)b) - fileSize((File *)a));
+static int reverse_file_compare(const void *a, const void *b)
+{
+    return -compareFileSize(a, b);
 }
 
 size_t binpacking(size_t diskSize, List *files, List *disks)
 {
-    llSort(files, compare);
+    llSort(files, reverse_file_compare);
     if(llLength(files) == 0)
         return 0;
 
