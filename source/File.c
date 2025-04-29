@@ -25,6 +25,7 @@ File *fileCreate(char *name, size_t size)
 
 void fileFree(void *f)
 {
+    free(((File *)f)->name);
     free(f);
 }
 

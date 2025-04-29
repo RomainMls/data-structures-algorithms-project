@@ -164,6 +164,7 @@ void treap_free(Treap_tree *t){
     if(t == NULL)
         return;
     treap_free_subtree(t->root);
+    free(t);
 }
 
 Disk *getDisk(Treap_node *n){

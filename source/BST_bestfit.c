@@ -157,7 +157,7 @@ void treap_delete
   } else
     t->root = q;
 
-  free (p);
+  free(p);
 }
 
 Treap_tree *treap_create(void){
@@ -181,6 +181,7 @@ void treap_free(Treap_tree *t){
     if(t == NULL)
         return;
     treap_free_subtree(t->root);
+    free(t);
 }
 
 Disk *getDisk(Treap_node *n){

@@ -60,7 +60,7 @@ size_t diskUsedSpace(const Disk *d);
 
 /**
  * @brief Compares two disks on their free space. Returns a negative (resp. positive) 
- * interger if the size of the first disk is greater (resp. lower) than the size of 
+ * interger if the size of the first disk is lower (resp. greater) than the size of 
  * the second one. Returns 0 if they are equal.
  * 
  * @param d1 the first disk

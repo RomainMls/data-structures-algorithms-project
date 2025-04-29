@@ -1,5 +1,5 @@
 
-/* Interface for a priority queue. The keys are of type 'void *' and will
+/* Interface for a priority queue. The keys are of type 'void *' and will 
  * be compared using the 'compare' function given as argument to the function
  * pqCreate.
  */
@@ -19,7 +19,9 @@ typedef struct PQ_t PQ;
  *
  * PARAMETERS
  * capacity         Maximum number of elements that can be stored in the queue.
- * compare          A function to compare two keys
+ * compare          A function to compare two keys (should return a negative, 
+ *                  zero, or positive integer if the first key is resp. lower, 
+ *                  equal or greater than the second key given as arguments)
  *
  * NOTE
  * The returned structure should be cleaned with `pqFree` after
@@ -68,7 +70,7 @@ void *pqGetMax(const PQ* pq);
 
 /* ------------------------------------------------------------------------- *
  * Returns the maximum key currently stored in the priority queue and extracts
- * it from the queue. The queue must contain at least one key (otherwise
+ * it from the queue. The queue must contain at least one key (otherwise 
  * calling the function results in an undefined behavior).
  *
  * PARAMETERS

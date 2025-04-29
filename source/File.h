@@ -6,7 +6,7 @@
 typedef struct File_t File;
 
 /**
- * @brief Creates a file
+ * @brief Creates a file. fileName will be freed by fileFree.
  * 
  * @param fileName the name of the file
  * @param fileSize the size of the file
@@ -15,7 +15,7 @@ typedef struct File_t File;
 File *fileCreate(char *fileName, size_t fileSize);
 
 /**
- * @brief Frees file f from memory
+ * @brief Frees file f from memory, include the file name.
  * 
  * @param f the file
  */
@@ -39,7 +39,7 @@ char *fileName(const File *f);
 
 /**
  * @brief Compares two files according to their size. Returns a negative (resp. positive) 
- * interger if the size of the first file is greater (resp. lower) than the size of the
+ * interger if the size of the first file is lower (resp. greater) than the size of the
  * second one. Returns 0 if they are equal.
  *
  * @param f1 the first file

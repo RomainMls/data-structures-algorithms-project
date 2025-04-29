@@ -67,6 +67,8 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
 
             if (!diskAddFile(diskToStoreIn, currentFile))
             {
+                treap_free(treap);
+                diskFree(diskToStoreIn);
                 printf("BP_firstfit: can't add file to disk\n");
                 exit(1);
             }
