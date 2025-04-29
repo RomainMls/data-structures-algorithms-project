@@ -36,6 +36,11 @@ void pqFree(PQ* pq)
     free(pq);
 }
 
+static size_t parent(size_t i)
+{
+    return (i-1)/2;
+}
+
 bool pqInsert(PQ* pq, void *key)
 {
     if(pq->size >= pq->capacity)
@@ -46,13 +51,13 @@ bool pqInsert(PQ* pq, void *key)
     pq->array[i] = key;
 
     // max heapify
-    while(i > 0 && pq->compare(pq->array[i/2], pq->array[i]) < 0)       // i/2 is the parent of i
+    while(i > 0 && pq->compare(pq->array[parent(i)], pq->array[i]) < 0)
     {
-        void *temp = pq->array[i/2];
-        pq->array[i/2] = pq->array[i];
+        void *temp = pq->array[parent(i)];
+        pq->array[parent(i)] = pq->array[i];
         pq->array[i] = temp;
 
-        i /= 2;
+        i = parent(i);
     }
 
     return true;
@@ -81,7 +86,6 @@ static void max_heapify(PQ *pq, size_t i)
 
     if(max != i)
     {
-        // swap i et max
         void *tmp = pq->array[i];
         pq->array[i] = pq->array[max];
         pq->array[max] = tmp;
