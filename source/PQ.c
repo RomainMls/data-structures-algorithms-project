@@ -33,6 +33,7 @@ PQ *pqCreate(size_t capacity, int (*compare)(const void *, const void *))
 void pqFree(PQ* pq)
 {
     free(pq->array);
+    free(pq);
 }
 
 bool pqInsert(PQ* pq, void *key)

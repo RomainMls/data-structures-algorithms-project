@@ -34,21 +34,19 @@ size_t binpacking(size_t diskSize, List *files, List *disks)
             diskAddFile(mostFreeDisk, f);
 
             //Reorganize pq with the new value
-            if(pqSize(pq) > 1){
-                pqExtractMax(pq);
-                pqInsert(pq, mostFreeDisk);
-            }
+            pqExtractMax(pq);
+            pqInsert(pq, mostFreeDisk);
+
         } else {
             //The file cannot be save on a disk, return error
             if(fileSize(f) > diskSize)
                 return 0;
 
             Disk *newDisk = diskCreate(diskSize);
+            diskAddFile(newDisk, f);
             pqInsert(pq, newDisk);
             llInsertLast(disks, newDisk);
             nbDisks++;
-
-            diskAddFile(newDisk, f);
         }
         p = llNext(p);
     }
