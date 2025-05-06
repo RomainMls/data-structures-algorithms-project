@@ -8,31 +8,37 @@ with open(file_path, "r") as f:
 
 # Mapping short names to full names
 name_map = {
-    "bpnextfit": "Next Fit",
-    "bpworstfit": "Worst Fit",
-    "bpbestfit": "Best Fit",
-    "bpfirstfit": "First Fit"
+    "next": "Next Fit",
+    "worst": "Worst Fit",
+    "best": "Best Fit",
+    "first": "First Fit"
 }
 
 # Prepare data structures
 data = {name: {"x": [], "time": [], "lost": []} for name in name_map.values()}
 
-current_algo = ""
-for line in lines:
-    line = line.strip()
-    if line.startswith("./") or line.startswith("bp"):
-        raw_algo = line.split()[0].replace("./", "")
-        current_algo = name_map[raw_algo]
-        x_value = int(line.split()[1])
-        data[current_algo]["x"].append(x_value)
-    elif "avg time" in line:
-        time_val = float(re.search(r"avg time = ([\d.]+)", line).group(1))
-        data[current_algo]["time"].append(time_val)
-    elif "avg lost" in line:
-        lost_val = int(re.search(r"avg lost = (\d+)", line).group(1))
-        data[current_algo]["lost"].append(lost_val)
+i = 0
+while i < len(lines):
+    line = lines[i].strip()
+    if ";" in line:
+        algo_short, x_value = line.split(";")
+        algo_full = name_map[algo_short]
+        x_value = int(x_value)
+        avg_time_line = lines[i + 1].strip()
+        avg_lost_line = lines[i + 2].strip()
 
-# Plot avg time
+        time_val = float(re.search(r"avg time = ([\d.]+)", avg_time_line).group(1))
+        lost_val = int(re.search(r"avg lost = (\d+)", avg_lost_line).group(1))
+
+        data[algo_full]["x"].append(x_value)
+        data[algo_full]["time"].append(time_val)
+        data[algo_full]["lost"].append(lost_val)
+
+        i += 3  # move to next block
+    else:
+        i += 1  # skip unknown lines
+
+# Plot time comparison
 plt.figure(figsize=(12, 6))
 for algo, values in data.items():
     plt.plot(values["x"], values["time"], label=algo)
@@ -44,7 +50,7 @@ plt.grid(True)
 plt.tight_layout()
 plt.savefig("time_comparaison.pdf")
 
-# Plot avg lost
+# Plot lost comparison
 plt.figure(figsize=(12, 6))
 for algo, values in data.items():
     plt.plot(values["x"], values["lost"], label=algo)
@@ -56,14 +62,14 @@ plt.grid(True)
 plt.tight_layout()
 plt.savefig("lost_comparaison.pdf")
 
-# Plot avg lost for only Best Fit and First Fit
+# Plot selected lost comparison
 plt.figure(figsize=(12, 6))
-for algo in ["Best Fit", "First Fit"]:
+for algo in ["Worst Fit", "Best Fit", "First Fit"]:
     plt.plot(data[algo]["x"], data[algo]["lost"], label=algo)
-plt.title("Comparaison du gaspillage")
+plt.title("Comparaison du gaspillage (Best/First/Worst)")
 plt.xlabel("Nombre de fichiers")
 plt.ylabel("Unités de gaspillage")
 plt.legend()
 plt.grid(True)
 plt.tight_layout()
-plt.savefig("lost_comparaison_bestfit_firstfit.pdf")
+plt.savefig("lost_comparaison2.pdf")

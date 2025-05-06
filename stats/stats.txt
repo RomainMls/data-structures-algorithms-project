@@ -1,123 +1,180 @@
-./bpnextfit 100000 10
-avg time = 0.069191
-avg lost = 14476681518
-./bpnextfit 200000 10
-avg time = 0.160744
-avg lost = 28957868893
-./bpnextfit 300000 10
-avg time = 0.255507
-avg lost = 43454146091
-./bpnextfit 400000 10
-avg time = 0.371627
-avg lost = 57927626277
-./bpnextfit 500000 10
-avg time = 0.500041
-avg lost = 72441915147
-./bpnextfit 600000 10
-avg time = 0.622381
-avg lost = 86901937989
-./bpnextfit 700000 10
-avg time = 0.757083
-avg lost = 101399333694
-./bpnextfit 800000 10
-avg time = 0.888722
-avg lost = 115879478967
-./bpnextfit 900000 10
-avg time = 1.038402
-avg lost = 130366371046
-./bpnextfit 1000000 10
-avg time = 1.270412
-avg lost = 144840487887
-
-./bpworstfit 100000 10
-avg time = 0.066289
-avg lost = 14498581518
-./bpworstfit 200000 10
-avg time = 0.165614
-avg lost = 28673568893
-./bpworstfit 300000 10
-avg time = 0.274085
-avg lost = 43526046091
-./bpworstfit 400000 10
-avg time = 0.408593
-avg lost = 58030826277
-./bpworstfit 500000 10
-avg time = 0.503227
-avg lost = 71633015147
-./bpworstfit 600000 10
-avg time = 0.651147
-avg lost = 85946037989
-./bpworstfit 700000 10
-avg time = 0.751395
-avg lost = 100273933694
-./bpworstfit 800000 10
-avg time = 0.891884
-avg lost = 114603178967
-./bpworstfit 900000 10
-avg time = 1.049683
-avg lost = 130582971046
-./bpworstfit 1000000 10
-avg time = 1.179637
-avg lost = 145082287887
-
-./bpbestfit 100000 10
-avg time = 0.086444
-avg lost = 77522618
-./bpbestfit 200000 10
-avg time = 0.214227
-avg lost = 112274485
-./bpbestfit 300000 10
-avg time = 0.355917
-avg lost = 124611065
-./bpbestfit 400000 10
-avg time = 0.509254
-avg lost = 166489754
-./bpbestfit 500000 10
-avg time = 0.645220
-avg lost = 185417440
-./bpbestfit 600000 10
-avg time = 0.815995
-avg lost = 205461116
-./bpbestfit 700000 10
-avg time = 0.973899
-avg lost = 182978215
-./bpbestfit 800000 10
-avg time = 1.104967
-avg lost = 167920135
-./bpbestfit 900000 10
-avg time = 1.272827
-avg lost = 215153171
-./bpbestfit 1000000 10
-avg time = 1.464392
-avg lost = 284827428
-
-./bpfirstfit 100000 10
-avg time = 0.082209
-avg lost = 82779704
-./bpfirstfit 200000 10
-avg time = 0.200829
-avg lost = 119492925
-./bpfirstfit 300000 10
-avg time = 0.315377
-avg lost = 135322924
-./bpfirstfit 400000 10
-avg time = 0.473290
-avg lost = 156016832
-./bpfirstfit 500000 10
-avg time = 0.592241
-avg lost = 163091900
-./bpfirstfit 600000 10
-avg time = 0.725946
-avg lost = 192532739
-./bpfirstfit 700000 10
-avg time = 0.890712
-avg lost = 213831048
-./bpfirstfit 800000 10
-avg time = 1.070337
-avg lost = 230970498
-./bpfirstfit 900000 10
-avg time = 1.245850
-avg lost = 228785456
-./bpfirstfit 1000000 10
-avg time = 1.377924
-avg lost = 212261228
+next;100000
+avg time = 0.059991
+avg lost = 14478784446
+next;200000
+avg time = 0.132194
+avg lost = 28963813138
+next;300000
+avg time = 0.221828
+avg lost = 43450918994
+next;400000
+avg time = 0.326425
+avg lost = 57939889483
+next;500000
+avg time = 0.415994
+avg lost = 72420143943
+next;600000
+avg time = 0.556581
+avg lost = 86922436886
+next;700000
+avg time = 0.631668
+avg lost = 101394782285
+next;800000
+avg time = 0.755417
+avg lost = 115881920559
+next;900000
+avg time = 0.855203
+avg lost = 130375846764
+next;1000000
+avg time = 0.961066
+avg lost = 144856966557
+next;1100000
+avg time = 1.096138
+avg lost = 159323233599
+next;1200000
+avg time = 1.176003
+avg lost = 173807074956
+next;1300000
+avg time = 1.315512
+avg lost = 188291469389
+next;1400000
+avg time = 1.447950
+avg lost = 202760757491
+next;1500000
+avg time = 1.669804
+avg lost = 217248225733
+worst;100000
+avg time = 0.082401
+avg lost = 78184446
+worst;200000
+avg time = 0.182138
+avg lost = 117313138
+worst;300000
+avg time = 0.295649
+avg lost = 147668994
+worst;400000
+avg time = 0.430807
+avg lost = 163089483
+worst;500000
+avg time = 0.586356
+avg lost = 183293943
+worst;600000
+avg time = 0.785743
+avg lost = 206036886
+worst;700000
+avg time = 0.984612
+avg lost = 192682285
+worst;800000
+avg time = 1.076951
+avg lost = 206370559
+worst;900000
+avg time = 1.184920
+avg lost = 225946764
+worst;1000000
+avg time = 1.366106
+avg lost = 250566557
+worst;1100000
+avg time = 1.512106
+avg lost = 244783599
+worst;1200000
+avg time = 1.694280
+avg lost = 232174956
+worst;1300000
+avg time = 1.832024
+avg lost = 237419389
+worst;1400000
+avg time = 2.002642
+avg lost = 268957491
+worst;1500000
+avg time = 2.111384
+avg lost = 261975733
+best;100000
+avg time = 0.113155
+avg lost = 73790490
+best;200000
+avg time = 0.220408
+avg lost = 122918656
+best;300000
+avg time = 0.344923
+avg lost = 142939265
+best;400000
+avg time = 0.507665
+avg lost = 141283268
+best;500000
+avg time = 0.645433
+avg lost = 176270595
+best;600000
+avg time = 0.851981
+avg lost = 173718681
+best;700000
+avg time = 0.934856
+avg lost = 192842141
+best;800000
+avg time = 1.070173
+avg lost = 193182681
+best;900000
+avg time = 1.219804
+avg lost = 218444469
+best;1000000
+avg time = 1.300582
+avg lost = 257529484
+best;1100000
+avg time = 1.500418
+avg lost = 241737332
+best;1200000
+avg time = 1.663515
+avg lost = 261188635
+best;1300000
+avg time = 1.832747
+avg lost = 287472563
+best;1400000
+avg time = 1.942897
+avg lost = 329938203
+best;1500000
+avg time = 2.158391
+avg lost = 234853931
+first;100000
+avg time = 0.080909
+avg lost = 85953815
+first;200000
+avg time = 0.192319
+avg lost = 99676940
+first;300000
+avg time = 0.305846
+avg lost = 131031980
+first;400000
+avg time = 0.438105
+avg lost = 164832803
+first;500000
+avg time = 0.563746
+avg lost = 183389806
+first;600000
+avg time = 0.687185
+avg lost = 169260028
+first;700000
+avg time = 0.826060
+avg lost = 190019640
+first;800000
+avg time = 0.972933
+avg lost = 198786573
+first;900000
+avg time = 1.116114
+avg lost = 211497990
+first;1000000
+avg time = 1.272698
+avg lost = 244487441
+first;1100000
+avg time = 1.428075
+avg lost = 228666665
+first;1200000
+avg time = 1.565121
+avg lost = 227257016
+first;1300000
+avg time = 1.666648
+avg lost = 257365353
+first;1400000
+avg time = 1.831899
+avg lost = 258631678
+first;1500000
+avg time = 1.993393
+avg lost = 300644466

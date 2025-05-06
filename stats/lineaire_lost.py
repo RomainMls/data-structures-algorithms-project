@@ -2,28 +2,42 @@ import re
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
-# Load file
-with open("stats.txt", "r") as f:
+# Load and parse the data
+file_path = "stats.txt"
+with open(file_path, "r") as f:
     lines = f.readlines()
 
-# Initialize containers
-data = {
-    "bpnextfit": {"x": [], "lost": []},
-    "bpworstfit": {"x": [], "lost": []},
-    "bpbestfit": {"x": [], "lost": []},
-    "bpfirstfit": {"x": [], "lost": []}
+# Mapping short names to full names
+name_map = {
+    "next": "Next Fit",
+    "worst": "Worst Fit",
+    "best": "Best Fit",
+    "first": "First Fit"
 }
 
-current_algo = ""
-for line in lines:
-    line = line.strip()
-    if line.startswith("./") or line.startswith("bp"):
-        current_algo = line.split()[0].replace("./", "")
-        if current_algo in data:
-            data[current_algo]["x"].append(int(line.split()[1]))
-    elif "avg lost" in line and current_algo in data:
-        lost = int(re.search(r"avg lost = (\d+)", line).group(1))
-        data[current_algo]["lost"].append(lost)
+# Prepare data structures
+data = {name: {"x": [], "time": [], "lost": []} for name in name_map.values()}
+
+i = 0
+while i < len(lines):
+    line = lines[i].strip()
+    if ";" in line:
+        algo_short, x_value = line.split(";")
+        algo_full = name_map[algo_short]
+        x_value = int(x_value)
+        avg_time_line = lines[i + 1].strip()
+        avg_lost_line = lines[i + 2].strip()
+
+        time_val = float(re.search(r"avg time = ([\d.]+)", avg_time_line).group(1))
+        lost_val = int(re.search(r"avg lost = (\d+)", avg_lost_line).group(1))
+
+        data[algo_full]["x"].append(x_value)
+        data[algo_full]["time"].append(time_val)
+        data[algo_full]["lost"].append(lost_val)
+
+        i += 3  # move to next block
+    else:
+        i += 1  # skip unknown lines
 
 # Function to compute slope and R²
 def compute_regression(x, y):
@@ -48,6 +62,6 @@ for key in data:
 
     name = key.replace("bp", "").capitalize().replace("fit", " Fit")
     print(f"{name} regressions:")
-    print(f"  Linear     - Slope: {slope_lin:.2f}, R²: {r2_lin:.3f}")
-    print(f"  Logarithmic- Slope: {slope_log:.2f}, R²: {r2_log:.3f}")
-    print(f"  Quadratic  - Slope: {slope_quad:.2f}, R²: {r2_quad:.3f}\n")
+    print(f"  Linear     - Slope: {slope_lin:.2f}")
+    print(f"  Logarithmic- Slope: {slope_log:.2f}")
+    print(f"  Quadratic  - Slope: {slope_quad:.2f}\n")
