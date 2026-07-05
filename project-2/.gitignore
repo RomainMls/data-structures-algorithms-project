@@ -1,0 +1,8 @@
+.vscode
+*.o
+bpbestfit
+bpfirstfit
+bpnaive
+bpnextfit
+bpworstfit
+stats/.env
