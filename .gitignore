@@ -1,0 +1,16 @@
+﻿.vscode/
+*.o
+
+# selection-algorithms
+selection-algorithms/selectionselect
+selection-algorithms/heapselect
+selection-algorithms/quickselect
+selection-algorithms/frselect
+
+# bin-packing-heuristics
+bin-packing-heuristics/source/bpbestfit
+bin-packing-heuristics/source/bpfirstfit
+bin-packing-heuristics/source/bpnaive
+bin-packing-heuristics/source/bpnextfit
+bin-packing-heuristics/source/bpworstfit
+bin-packing-heuristics/stats/.env
